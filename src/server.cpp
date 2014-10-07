@@ -5,6 +5,8 @@
 
 #include <json/json.h>
 
+#include "table.h"
+
 using namespace std;
 
 namespace http = boost::network::http;
@@ -51,6 +53,9 @@ struct handler {
 };
 
 int main(int arg, char * argv[]) {
+
+    Table table;
+
     handler handler_;
     http_server::options options(handler_);
     http_server server_(

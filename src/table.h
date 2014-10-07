@@ -1,26 +1,17 @@
 #include <tuple>
 #include <vector>
+#include <array>
 #include <cmath>
+
+#include "ledstrip.h"
+
+// Table 0,0: top left corner
+static const int TABLE_WIDTH = 1000; //mm
+static const int TABLE_HEIGHT = 500; //mm
 
 static const float MAX_COLOR_DISTANCE = 1.; //meters (distance max to which a light source impact LEDs)
 
 enum source_type { LIGHT = 0, SOUND  };
-
-class Color {
-
-    float _r, _g, _b;
-
-public:
-    Color(): _r(0.), _g(0.), _b(0.) {}
-    Color(char r, char g, char b) : _r(r * 1./255), _g(g * 1./255), _b(b * 1./255) {}
-    Color(float r, float g, float b) : _r(r), _g(g), _b(b) {}
-
-    std::tuple<float, float, float> rgb() {return std::make_tuple(_r, _g, _b);}
-    std::tuple<float, float, float> hsl() {return std::make_tuple(_r, _g, _b);}
-
-    Color mix(const Color& color);
-    static Color from_mix(const std::vector<std::tuple<Color, float>>& colors);
-};
 
 class Source {
 
@@ -61,7 +52,7 @@ public:
     float dtheta() const {return _dtheta;}
 };
 
-class LightSource : Source {
+class LightSource : public Source {
 
 
 protected:
@@ -76,7 +67,7 @@ public:
 
 };
 
-class SoundSource : Source {
+class SoundSource : public Source {
 
 protected:
     std::string sound_name;
@@ -91,7 +82,7 @@ public:
 
 class Actuator {
 
-
+protected:
     float x, y;
 
 public:
@@ -103,16 +94,32 @@ public:
 
 class LED : Actuator {
 
+    static int last_id;
 
-    Color color;
+    int idx;
+    Color _color;
 
 public:
 
     // compute the location of the LED based on its index.
-    LED(char idx);
+    LED();
 
-    void update(const std::vector<Source>& sources);
+    void update(const std::vector<LightSource>& lights);
 
-    std::tuple<char, char, char> get() {return value;}
+    Color color() {return _color;}
+
+};
+
+class Table {
+
+    std::vector<LightSource> lights;
+    std::array<LED, NB_LEDS> leds;
+
+    Ledstrip ledstrip;
+
+public:
+
+    void add_light();
+    void step();
 
 };

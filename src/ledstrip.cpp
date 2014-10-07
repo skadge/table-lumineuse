@@ -19,7 +19,7 @@ Ledstrip::Ledstrip() {
   /* Open the device file using Low-Level IO */
   fd = open(SPIDEV,O_WRONLY);
   if(fd<0) {
-    fprintf(stderr,"Error %d: %s\n",errno,strerror(errno));
+    fprintf(stderr,"Error %d when trying to open the SPI port: %s\n",errno,strerror(errno));
     exit(1);
   }
 
