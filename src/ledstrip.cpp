@@ -62,7 +62,7 @@ void Ledstrip::blank() {
 }
 
 
-void Ledstrip::fill(int r, int g, int b) {
+void Ledstrip::fill(uint8_t r, uint8_t g, uint8_t b) {
   for(int i=0;i<NB_LEDS;i++) {
     write_gamma_color(&buf.pixels[i],r,g,b);
   }
@@ -71,15 +71,33 @@ void Ledstrip::fill(int r, int g, int b) {
 
 }
 
-void Ledstrip::set(int idx, int r, int g, int b) {
+void Ledstrip::fill(Color color) {
+    uint8_t r, g, b;
+    std::tie(r, g, b) = color.rgb();
+    fill(r, g, b);
+}
+
+void Ledstrip::set(int idx, uint8_t r, uint8_t g, uint8_t b) {
     write_gamma_color(&buf.pixels[idx],r,g,b);
     send_buffer(fd,&buf);
 
 }
 
+void Ledstrip::set(int idx, Color color) {
+    uint8_t r, g, b;
+    std::tie(r, g, b) = color.rgb();
+    set(idx, r, g, b);
+}
 
+void Ledstrip::set(const std::array<Color, NB_LEDS>& colors) {
+    uint8_t r, g, b;
 
-
+    for(int i=0;i<NB_LEDS;i++) {
+        std::tie(r, g, b) = colors[i].rgb();
+        write_gamma_color(&buf.pixels[i],r,g,b);
+    }
+    send_buffer(fd,&buf);
+}
 
 /* Convert hsv values (0<=h<360, 0<=s<=1, 0<=v<=1) to rgb values (0<=r<=1, etc) */
 void HSVtoRGB(double h, double s, double v, double *r, double *g, double *b) {
