@@ -1,0 +1,66 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0px;
+        padding: 0px;
+      }
+    </style>
+    <script src="http://d3lp1msu2r81bx.cloudfront.net/kjs/js/lib/kinetic-v5.0.2.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  </head>
+  <body>
+    <div id="container"></div>
+    <script defer="defer">
+      var stage = new Kinetic.Stage({
+        container: 'container',
+        width: 1000,
+        height: 500
+      });
+
+      var table_layer = new Kinetic.Layer({
+      });
+      var table = new Kinetic.Rect({
+        x: 0,
+        y: 0,
+        width: 1000,
+        height: 500,
+        fill: '#DDD',
+        stroke: 'black',
+        strokeWidth: 6
+      });
+      table_layer.add(table);
+
+      var sources_layer = new Kinetic.Layer();
+
+      var source = new Kinetic.Circle({
+        x: 500,
+        y: 250,
+        radius: 20,
+        fill: '#FFD2FF',
+        stroke: 'black',
+        strokeWidth: 4,
+        draggable: true
+      });
+
+      // add cursor styling
+      source.on('mouseover', function() {
+        document.body.style.cursor = 'pointer';
+      });
+      source.on('mouseout', function() {
+        document.body.style.cursor = 'default';
+      });
+      source.on('click', function() {
+        
+      });
+      source.on('mouseup', function() {
+        $.get('http://localhost:8000?content={"src":{"id":1,"type":"color","value":[255,0,0],"x":' + source.x() + ',"y":' + source.y() + "}}");
+      });
+
+      sources_layer.add(source);
+      stage.add(table_layer);
+      stage.add(sources_layer);
+    </script>
+  </body>
+</html>   
