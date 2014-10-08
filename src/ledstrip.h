@@ -11,6 +11,7 @@ class Ledstrip {
 
   lpd8806_buffer buf;
   int fd;
+  bool initialized;
 
 public:
     Ledstrip();

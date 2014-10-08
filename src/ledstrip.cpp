@@ -10,9 +10,11 @@
 
 #include "ledstrip.h"
 
+using namespace std;
+
 void HSVtoRGB(double h, double s, double v, double *r, double *g, double *b);
 
-Ledstrip::Ledstrip() {
+Ledstrip::Ledstrip() : initialized(false) {
 
   int return_value;
 
@@ -20,21 +22,23 @@ Ledstrip::Ledstrip() {
   fd = open(SPIDEV,O_WRONLY);
   if(fd<0) {
     fprintf(stderr,"Error %d when trying to open the SPI port: %s\n",errno,strerror(errno));
-    exit(1);
+    return;
   }
 
   /* Initialize the SPI bus for Total Control Lighting */
   return_value = spi_init(fd);
   if(return_value==-1) {
     fprintf(stderr,"SPI initialization error %d: %s\n",errno, strerror(errno));
-    exit(1);
+    return;
   }
 
   /* Initialize pixel buffer */
-  if(lpd8806_init(&buf, NB_LEDS) <0) {
+  if(lpd8806_init(&buf, NB_LEDS) < 0) {
     fprintf(stderr,"Pixel buffer initialization error: Not enough memory.\n");
-    exit(1);
+    return;
   }
+
+  initialized = true;
 
   /* Set the gamma correction factors for each color */
   set_gamma(2.2,2.2,2.2);
@@ -52,6 +56,8 @@ Ledstrip::~Ledstrip() {
 }
 
 void Ledstrip::blank() {
+    if (!initialized) return;
+
   /* Blank the pixels */
   for(int i=0;i<NB_LEDS;i++) {
     write_gamma_color(&buf.pixels[i],0x00,0x00,0x00);
@@ -63,6 +69,8 @@ void Ledstrip::blank() {
 
 
 void Ledstrip::fill(uint8_t r, uint8_t g, uint8_t b) {
+    if (!initialized) return;
+
   for(int i=0;i<NB_LEDS;i++) {
     write_gamma_color(&buf.pixels[i],r,g,b);
   }
@@ -78,6 +86,8 @@ void Ledstrip::fill(Color color) {
 }
 
 void Ledstrip::set(int idx, uint8_t r, uint8_t g, uint8_t b) {
+    if (!initialized) return;
+
     write_gamma_color(&buf.pixels[idx],r,g,b);
     send_buffer(fd,&buf);
 
@@ -90,6 +100,8 @@ void Ledstrip::set(int idx, Color color) {
 }
 
 void Ledstrip::set(const std::array<Color, NB_LEDS>& colors) {
+    if (!initialized) return;
+
     uint8_t r, g, b;
 
     for(int i=0;i<NB_LEDS;i++) {
