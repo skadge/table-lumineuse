@@ -55,6 +55,18 @@ struct handler {
 int main(int arg, char * argv[]) {
 
     Table table;
+    auto orange = make_shared<LightSource>();
+    table.add_light(orange);
+    orange->color = Color(255,255,0);
+    orange->update(800, 200, 0);
+
+    auto red = make_shared<LightSource>();
+    table.add_light(red);
+    red->color = Color(255,0,0);
+    red->update(900, 34, 0);
+
+    table.step();
+    table.show();
 
     handler handler_;
     http_server::options options(handler_);

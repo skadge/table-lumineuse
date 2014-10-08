@@ -36,27 +36,34 @@ LED::LED() {
         x = 0; y = TABLE_HEIGHT - (ledx - (2 * TABLE_WIDTH + TABLE_HEIGHT));
     }
     ///////
-
-    cout << "Created LED " << idx << " @(" << x << "x" << y << "mm)" << endl;
 }
 
-void LED::update(const std::vector<LightSource>& sources){
+void LED::update(const std::vector<shared_ptr<LightSource>> sources){
+
+    if (sources.size() == 0) return;
 
     vector<tuple<Color, float>> lightsources;
 
-    for (auto& source : sources) {
-        auto dist = distance(source);
+    for (auto source : sources) {
+        auto dist = distance(*source);
         if (dist < MAX_COLOR_DISTANCE) {
             lightsources.push_back(
-                    make_tuple(source.color(),
+                    make_tuple(source->color,
                                1. - dist / MAX_COLOR_DISTANCE)
                     );
         }
     }
 
-    //_color = Color::from_mix(lightsources);
+    if (lightsources.size() == 0) return;
+    _color = Color::from_mix(lightsources);
 }
 
+ostream& operator<< (ostream &out, const LED &led) {
+    out << "LED " << led.idx 
+              << " (" << (int) led.x << "x" << (int) led.y << "mm, color: " << led._color;
+
+    return out;
+}
 
 void Table::step(){
 
@@ -71,4 +78,11 @@ void Table::step(){
 
     ledstrip.set(colors);
 
+}
+
+void Table::show(){
+
+    for (auto& led : leds) {
+        cout << led << endl;
+    }
 }

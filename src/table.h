@@ -2,6 +2,7 @@
 #include <vector>
 #include <array>
 #include <cmath>
+#include <memory>
 
 #include "ledstrip.h"
 
@@ -9,7 +10,7 @@
 static const int TABLE_WIDTH = 1000; //mm
 static const int TABLE_HEIGHT = 500; //mm
 
-static const float MAX_COLOR_DISTANCE = 1.; //meters (distance max to which a light source impact LEDs)
+static const int MAX_COLOR_DISTANCE = 1000; //mm (distance max to which a light source impact LEDs)
 
 enum source_type { LIGHT = 0, SOUND  };
 
@@ -24,7 +25,7 @@ protected:
 public:
 
     // virtual destructor -> polymorphic class
-    virtual ~Source();
+    virtual ~Source() {}
 
     source_type type;
 
@@ -38,9 +39,9 @@ public:
     }
 
     void update(float x, float y, float theta) {
-        _dx += _x - x; x = _x;
-        _dy += _y - y; y = _y;
-        _dtheta += _theta - theta; theta = _theta;
+        _dx += _x - x; _x = x;
+        _dy += _y - y; _y = y;
+        _dtheta += _theta - theta; _theta = theta;
     }
 
     float x() const {return _x;}
@@ -55,15 +56,13 @@ public:
 class LightSource : public Source {
 
 
-protected:
-    Color _color;
 
 public:
     LightSource() {
         type = LIGHT;
     }
 
-    Color color() const { return _color;}
+    Color color;
 
 };
 
@@ -104,22 +103,26 @@ public:
     // compute the location of the LED based on its index.
     LED();
 
-    void update(const std::vector<LightSource>& lights);
+    void update(const std::vector<std::shared_ptr<LightSource>> lights);
 
-    Color color() {return _color;}
+    Color color() const {return _color;}
 
+    friend std::ostream& operator<< (std::ostream &out, const LED &led);
 };
 
 class Table {
 
-    std::vector<LightSource> lights;
+    std::vector<std::shared_ptr<LightSource>> lights;
     std::array<LED, NB_LEDS> leds;
 
     Ledstrip ledstrip;
 
 public:
 
-    void add_light();
+    void add_light(std::shared_ptr<LightSource> light) {lights.push_back(light);}
+
     void step();
+
+    void show();
 
 };
