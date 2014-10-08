@@ -1,4 +1,6 @@
 
+#define MIN(a,b) (((a)<(b))?(a):(b))
+
 #include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -161,4 +163,36 @@ void HSVtoRGB(double h, double s, double v, double *r, double *g, double *b) {
       *b = q;
       break;
   }
+}
+
+
+ostream& operator<< (ostream &out, const Color &color){
+    out << "(" << static_cast<int>(color._r) << ", " 
+               << static_cast<int>(color._g) << ", " 
+               << static_cast<int>(color._b) << ")";
+    return out;
+}
+
+/**
+ * Currently, simple weighted additive blend
+ */
+Color Color::from_mix(const vector<tuple<Color, float>>& colors) {
+
+    int r = 0, g = 0, b = 0;
+
+    for (const auto& weighted_color : colors) {
+        Color color;
+        float weight;
+        uint8_t _r, _g, _b;
+
+        tie(color, weight) = weighted_color;
+        tie(_r, _g, _b) = color.rgb();
+
+        r += _r * weight;
+        g += _g * weight;
+        b += _b * weight;
+
+    }
+
+    return Color(MIN(r, 255), MIN(g, 255), MIN(b, 255));
 }

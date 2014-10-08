@@ -1,5 +1,7 @@
 #include <tuple>
 #include <vector>
+#include <iostream>
+
 #include "lpd8806led.h"
 
 static const char *SPIDEV = "/dev/spidev0.0";
@@ -32,12 +34,12 @@ class Color {
 public:
     Color(): _r(0), _g(0), _b(0) {}
     Color(uint8_t r, uint8_t g, uint8_t b) : _r(r), _g(g), _b(b) {}
-    Color(float r, float g, float b) : _r(r * 255), _g(g * 255), _b(b * 255) {}
 
     std::tuple<uint8_t, uint8_t, uint8_t> rgb() const {return std::make_tuple(_r, _g, _b);}
     //std::tuple<float, float, float> hsl() const {return std::make_tuple(_r, _g, _b);}
 
-    Color mix(const Color& color);
+    friend std::ostream& operator<< (std::ostream &out, const Color &color);
+
     static Color from_mix(const std::vector<std::tuple<Color, float>>& colors);
 };
 
