@@ -1,22 +1,21 @@
-#include <boost/network/uri.hpp>
-#include <boost/network/protocol/http/server.hpp>
 #include <string>
 #include <iostream>
 
 #include <json/json.h>
 
+#include "http_server/server.hpp"
+#include "http_server/request_handler.hpp"
+#include "http_server/reply.hpp" // for stock reply HTTP 202 'accepted'
+
 #include "table.h"
 
 using namespace std;
-
-namespace http = boost::network::http;
-namespace uri = boost::network::uri;
+using namespace http::server; // boost asio HHTP server
 
 Json::Value root; // will contains the root value after parsing.
 Json::Reader reader;
 
 struct handler;
-typedef http::server<handler> http_server;
 
 void replaceAll(std::string& str, const std::string& from, const std::string& to) {
 
@@ -27,29 +26,55 @@ void replaceAll(std::string& str, const std::string& from, const std::string& to
     }
 }
 
-struct handler {
-    void operator() (http_server::request const &request,
-                     http_server::response &response) {
-        string ip = source(request);
-        string path = request.destination;
-        string query = path.substr(path.find("content=") + 8);
-        replaceAll(query,"%22","\"");
-        replaceAll(query,"%20"," ");
-        bool parsingSuccessful = reader.parse( query, root );
-        if (!parsingSuccessful) {
-            cerr << "Invalid command: " << query << endl;
+struct handler : public request_handler {
+
+    handler () {};
+
+    void handle_request(const request& request, reply& response)
+    {
+        // Decode url to path.
+        std::string request_path;
+        if (!url_decode(request.uri, request_path))
+        {
+            cerr << "Unable to decode URI: " << request_path << endl;
+            response = reply::stock_reply(reply::bad_request);
             return;
         }
 
+        // Request path must be absolute and not contain "..".
+        if (request_path.empty() || request_path[0] != '/'
+            || request_path.find("..") != std::string::npos)
+        {
+            cerr << "Invalid URI: " << request_path << endl;
+            response = reply::stock_reply(reply::bad_request);
+            return;
+        }
+
+        if (request_path.find("content=") == std::string::npos)
+        {
+            cerr << "URI must contains a 'content': " << request_path << endl;
+            response = reply::stock_reply(reply::bad_request);
+            return;
+        }
+
+
+
+        string query = request_path.substr(request_path.find("content=") + 8);
+        //replaceAll(query,"%22","\"");
+        //replaceAll(query,"%20"," ");
+        bool parsingSuccessful = reader.parse( query, root );
+        if (!parsingSuccessful) {
+            cerr << "Invalid command: " << query << endl;
+            response = reply::stock_reply(reply::bad_request);
+            return;
+        }
+
+        cout << "Command successfully parsed:\n";
         cout << root;
 
-        response = http_server::response::stock_reply(
-            http_server::response::ok, "Hello, world!");
+        response = reply::stock_reply(reply::accepted);
     }
 
-    void log(http_server::string_type const &info) {
-        std::cerr << "ERROR: " << info << '\n';
-    }
 };
 
 int main(int arg, char * argv[]) {
@@ -68,10 +93,7 @@ int main(int arg, char * argv[]) {
     table.step();
     table.show();
 
-    handler handler_;
-    http_server::options options(handler_);
-    http_server server_(
-        options.address("0.0.0.0")
-               .port("8000"));
-    server_.run();
+    cout << "Listening for clients..." << endl;
+    http::server::server<handler> s("0.0.0.0", "8080");
+    s.run();
 }

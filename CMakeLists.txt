@@ -16,8 +16,15 @@ add_library(LPD8806 SHARED src/ledstrip.cpp src/lpd8806led.c)
 add_executable( test_strip src/ledstrip.cpp src/test_ledstrip.cpp)
 target_link_libraries( test_strip LPD8806 )
 
-add_executable( table src/server.cpp src/table.cpp)
+
+file(GLOB http_server src/http_server/*.cpp)
+
+add_executable( table src/server.cpp src/table.cpp ${http_server})
 target_link_libraries( table LPD8806 ${Boost_LIBRARIES} ${JSONCPP_LIBRARIES} )
+
+#add_executable( server ${http_server})
+#target_link_libraries( server ${Boost_LIBRARIES} )
+
 
 
 #add_executable( table src/table.cpp)
