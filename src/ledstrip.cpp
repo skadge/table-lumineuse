@@ -35,7 +35,7 @@ Ledstrip::Ledstrip() : initialized(false) {
   }
 
   /* Initialize pixel buffer */
-  if(lpd8806_init(&buf, NB_LEDS) < 0) {
+  if(lpd8806_init(&buf, NB_LEDS + 1) < 0) {
     fprintf(stderr,"Pixel buffer initialization error: Not enough memory.\n");
     return;
   }
