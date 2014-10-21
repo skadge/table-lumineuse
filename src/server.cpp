@@ -75,6 +75,9 @@ struct handler : public request_handler {
 
         Json::Value src = root["src"];
         src1->update(src["x"].asInt(), src["y"].asInt(), 0);
+        src1->color = Color(src["value"][0].asInt(),
+                            src["value"][1].asInt(),
+                            src["value"][2].asInt());
         table.step();
 
         response = reply::stock_reply(reply::accepted);
