@@ -1,66 +1,97 @@
-<!DOCTYPE HTML>
-<html>
-  <head>
-    <style>
-      body {
-        margin: 0px;
-        padding: 0px;
-      }
-    </style>
-    <script src="http://d3lp1msu2r81bx.cloudfront.net/kjs/js/lib/kinetic-v5.0.2.min.js"></script>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-  </head>
-  <body>
-    <div id="container"></div>
-    <script defer="defer">
-      var stage = new Kinetic.Stage({
-        container: 'container',
-        width: 1000,
-        height: 500
-      });
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Table Lumineuse</title>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script type="text/javascript" src="http://code.createjs.com/easeljs-0.7.1.min.js"></script>
 
-      var table_layer = new Kinetic.Layer({
-      });
-      var table = new Kinetic.Rect({
-        x: 0,
-        y: 0,
-        width: 1000,
-        height: 500,
-        fill: '#DDD',
-        stroke: 'black',
-        strokeWidth: 6
-      });
-      table_layer.add(table);
+<script>
 
-      var sources_layer = new Kinetic.Layer();
+var canvas, stage;
 
-      var source = new Kinetic.Circle({
-        x: 500,
-        y: 250,
-        radius: 20,
-        fill: '#FFD2FF',
-        stroke: 'black',
-        strokeWidth: 4,
-        draggable: true
-      });
+var mouseTarget;	// the display object currently under the mouse, or being dragged
+var dragStarted;	// indicates whether we are currently in a drag operation
+var offset;
+var update = true;
 
-      // add cursor styling
-      source.on('mouseover', function() {
-        document.body.style.cursor = 'pointer';
-      });
-      source.on('mouseout', function() {
-        document.body.style.cursor = 'default';
-      });
-      source.on('click', function() {
-        
-      });
-      source.on('mouseup', function() {
-        $.get('http://localhost:8000?content={"src":{"id":1,"type":"color","value":[255,0,0],"x":' + source.x() + ',"y":' + source.y() + "}}");
-      });
+function init() {
+    // create stage and point it to the canvas:
+    canvas = document.getElementById("testCanvas");
 
-      sources_layer.add(source);
-      stage.add(table_layer);
-      stage.add(sources_layer);
-    </script>
-  </body>
-</html>   
+    //check to see if we are running in a browser with touch support
+    stage = new createjs.Stage(canvas);
+
+    // enable touch interactions if supported on the current device:
+    createjs.Touch.enable(stage);
+
+    // enabled mouse over / out events
+    stage.enableMouseOver(10);
+    stage.mouseMoveOutside = true; // keep tracking the mouse even when it leaves the canvas
+
+    var container = new createjs.Container();
+    stage.addChild(container);
+
+    var g = new createjs.Graphics();
+    g.setStrokeStyle(1); 
+    g.beginStroke(createjs.Graphics.getRGB(0,0,0)); 
+    g.beginFill(createjs.Graphics.getRGB(255,0,0)); 
+    g.drawCircle(0,0,10);
+
+    var s = new createjs.Shape(g);
+    s.x = 100;
+    s.y = 100;
+    s.cursor = "pointer";
+
+    container.addChild(s);
+
+    s.on("mousedown", function(evt) {
+            this.parent.addChild(this);
+            this.offset = {x:this.x-evt.stageX, y:this.y-evt.stageY};
+            });
+
+    // the pressmove event is dispatched when the mouse moves after a mousedown on the target until the mouse is released.
+    s.on("pressmove", function(evt) {
+            this.x = evt.stageX+ this.offset.x;
+            this.y = evt.stageY+ this.offset.y;
+            // indicate that the stage should be updated on the next tick:
+            update = true;
+            $.get('http://table-lumineuse.local:8080?content={"src":{"id":1,"type":"color","value":[255,0,0],"x":' + this.x + ',"y":' + this.y + "}}");
+            });
+/*
+    s.on("rollover", function(evt) {
+            this.scaleX = this.scaleY = this.scale*1.2;
+            update = true;
+            });
+
+    s.on("rollout", function(evt) {
+            this.scaleX = this.scaleY = this.scale;
+            update = true;
+            });
+*/
+
+    createjs.Ticker.addEventListener("tick", tick);
+}
+
+function stop() {
+    createjs.Ticker.removeEventListener("tick", tick);
+}
+
+function tick(event) {
+    // this set makes it so the stage only re-renders when an event handler indicates a change has happened.
+    if (update) {
+        update = false; // only update once
+        stage.update(event);
+    }
+}
+</script>
+
+</head>
+
+<body onload="init();">
+
+<div class="canvasHolder">
+    <canvas id="testCanvas" width="1000" height="500" style="background-color:#CCC"></canvas>
+</div>
+</body>
+</html>
