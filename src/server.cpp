@@ -17,6 +17,9 @@ Json::Reader reader;
 
 struct handler;
 
+Table table;
+auto src1 = make_shared<LightSource>();
+
 void replaceAll(std::string& str, const std::string& from, const std::string& to) {
 
     size_t start_pos = 0;
@@ -60,8 +63,6 @@ struct handler : public request_handler {
 
 
         string query = request_path.substr(request_path.find("content=") + 8);
-        //replaceAll(query,"%22","\"");
-        //replaceAll(query,"%20"," ");
         bool parsingSuccessful = reader.parse( query, root );
         if (!parsingSuccessful) {
             cerr << "Invalid command: " << query << endl;
@@ -69,8 +70,12 @@ struct handler : public request_handler {
             return;
         }
 
-        cout << "Command successfully parsed:\n";
-        cout << root;
+        //cout << "Command successfully parsed:\n";
+        //cout << root;
+
+        Json::Value src = root["src"];
+        src1->update(src["x"].asInt(), src["y"].asInt(), 0);
+        table.step();
 
         response = reply::stock_reply(reply::accepted);
     }
@@ -79,16 +84,15 @@ struct handler : public request_handler {
 
 int main(int arg, char * argv[]) {
 
-    Table table;
-    auto orange = make_shared<LightSource>();
-    table.add_light(orange);
-    orange->color = Color(255,255,0);
-    orange->update(800, 200, 0);
 
-    auto red = make_shared<LightSource>();
-    table.add_light(red);
-    red->color = Color(255,0,0);
-    red->update(900, 34, 0);
+    table.add_light(src1);
+    src1->color = Color(0,255,0);
+    src1->update(500, 250, 0);
+
+    //auto red = make_shared<LightSource>();
+    //table.add_light(red);
+    //red->color = Color(255,0,0);
+    //red->update(900, 34, 0);
 
     table.step();
     table.show();

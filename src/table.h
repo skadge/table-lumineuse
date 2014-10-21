@@ -119,6 +119,7 @@ class Table {
 
 public:
 
+
     void add_light(std::shared_ptr<LightSource> light) {lights.push_back(light);}
 
     void step();

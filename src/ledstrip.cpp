@@ -97,7 +97,7 @@ void Ledstrip::set(int idx, uint8_t r, uint8_t g, uint8_t b) {
 
 void Ledstrip::set(int idx, Color color) {
     uint8_t r, g, b;
-    std::tie(r, g, b) = color.rgb();
+    tie(r, g, b) = color.rgb();
     set(idx, r, g, b);
 }
 
@@ -107,7 +107,7 @@ void Ledstrip::set(const std::array<Color, NB_LEDS>& colors) {
     uint8_t r, g, b;
 
     for(int i=0;i<NB_LEDS;i++) {
-        std::tie(r, g, b) = colors[i].rgb();
+        tie(r, g, b) = colors[i].rgb();
         write_gamma_color(&buf.pixels[i],r,g,b);
     }
     send_buffer(fd,&buf);
