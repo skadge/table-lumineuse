@@ -15,6 +15,16 @@ var dragStarted;	// indicates whether we are currently in a drag operation
 var offset;
 var update = true;
 
+function drawSource(r, g, b) {
+    var gr = new createjs.Graphics();
+    gr.setStrokeStyle(3); 
+    gr.beginStroke(createjs.Graphics.getRGB(20,20,20)); 
+    gr.beginFill(createjs.Graphics.getRGB(r,g,b)); 
+    gr.drawCircle(0,0,20);
+
+    return gr;
+}
+
 function init() {
     // create stage and point it to the canvas:
     canvas = document.getElementById("testCanvas");
@@ -32,13 +42,11 @@ function init() {
     var container = new createjs.Container();
     stage.addChild(container);
 
-    var g = new createjs.Graphics();
-    g.setStrokeStyle(1); 
-    g.beginStroke(createjs.Graphics.getRGB(0,0,0)); 
-    g.beginFill(createjs.Graphics.getRGB(255,0,0)); 
-    g.drawCircle(0,0,10);
+    var r = 255;
+    var g = 120;
+    var b = 0;
 
-    var s = new createjs.Shape(g);
+    var s = new createjs.Shape(drawSource(r,g,b));
     s.x = 100;
     s.y = 100;
     s.cursor = "pointer";
@@ -48,6 +56,10 @@ function init() {
     s.on("mousedown", function(evt) {
             this.parent.addChild(this);
             this.offset = {x:this.x-evt.stageX, y:this.y-evt.stageY};
+            r = 255 * Math.random()|0;
+            g = 255 * Math.random()|0;
+            b = 255 * Math.random()|0;
+            this.graphics = drawSource(r,g,b);
             });
 
     // the pressmove event is dispatched when the mouse moves after a mousedown on the target until the mouse is released.
@@ -56,8 +68,9 @@ function init() {
             this.y = evt.stageY+ this.offset.y;
             // indicate that the stage should be updated on the next tick:
             update = true;
-            $.get('http://table-lumineuse.local:8080?content={"src":{"id":1,"type":"color","value":[255,0,0],"x":' + this.x + ',"y":' + this.y + "}}");
+            $.get('http://table-lumineuse.local:8080?content={"src":{"id":1,"type":"color","value":[' + r + ',' + g + ',' + b +'],"x":' + this.x + ',"y":' + this.y + "}}");
             });
+
 /*
     s.on("rollover", function(evt) {
             this.scaleX = this.scaleY = this.scale*1.2;
