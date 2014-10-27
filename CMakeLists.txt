@@ -4,12 +4,22 @@ project(table)
 
 SET(CMAKE_CXX_FLAGS "-std=c++11")
 
-FIND_PACKAGE( Boost 1.54 COMPONENTS system thread REQUIRED )
-INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
+find_package( Boost 1.54 COMPONENTS system thread REQUIRED )
+include_directories( ${Boost_INCLUDE_DIR} )
+
+find_package(OpenCV REQUIRED)
+include_directories(${OpenCV_INCLUDE_DIRS})
+
+find_package(raspicam REQUIRED)
+include_directories(${raspicam_INCLUDE_DIRS})
 
 find_package(PkgConfig)
 pkg_check_modules(JSONCPP jsoncpp)
 include_directories(${JSONCPP_INCLUDE_DIRS})
+
+pkg_check_modules(CHILITAGS chilitags)
+include_directories(${CHILITAGS_INCLUDE_DIRS})
+
 
 add_library(LPD8806 SHARED src/ledstrip.cpp src/lpd8806led.c)
 
@@ -24,6 +34,9 @@ target_link_libraries( table LPD8806 ${Boost_LIBRARIES} ${JSONCPP_LIBRARIES} )
 
 #add_executable( server ${http_server})
 #target_link_libraries( server ${Boost_LIBRARIES} )
+
+add_executable( tags src/chilitags.cpp)
+target_link_libraries( tags ${CHILITAGS_LDFLAGS} ${OpenCV_LIBRARIES} ${raspicam_CV_LIBS})
 
 
 
