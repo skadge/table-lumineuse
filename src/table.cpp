@@ -18,10 +18,11 @@ LED::LED() {
      *
      * (assumes a rectangular table, with LEDs on the perimeter)
      */
+    int offset = 15; // offset = 0 assumes led 0 in top left corner. offset = 30 assumes led 0 in top right corner, etc
     float nbleds = (float) NB_LEDS;
     float total_lenght = 2 * TABLE_WIDTH + 2 * TABLE_HEIGHT;
 
-    float ledx = total_lenght * idx / nbleds;
+    float ledx = total_lenght * ((idx + offset) % NB_LEDS) / nbleds;
 
     if (ledx < TABLE_WIDTH) {
         x = ledx; y = 0;
