@@ -1,3 +1,5 @@
+#include <thread>
+
 #include "table.h"
 
 #include <iostream>
@@ -56,12 +58,12 @@ void LED::update(const std::vector<shared_ptr<LightSource>> sources){
     }
 
     if (lightsources.size() == 0) return;
-    _color = Color::from_mix(lightsources);
+    color = Color::from_mix(lightsources);
 }
 
 ostream& operator<< (ostream &out, const LED &led) {
     out << "LED " << led.idx 
-              << " (" << (int) led.x << "x" << (int) led.y << "mm, color: " << led._color;
+              << " (" << (int) led.x << "x" << (int) led.y << "mm, color: " << led.color;
 
     return out;
 }
@@ -91,7 +93,14 @@ void Table::step(chrono::milliseconds dt){
 
             float alpha = (float) elapsed_fade.count() / fade_duration.count();
 
-            ledstrip.fill(current_plain_color.interpolate(active_color, alpha));
+            Color col = current_plain_color.interpolate(active_color, alpha);
+
+            ledstrip.fill(col);
+
+            // store the individual LEDs color to fade out at the end
+            for (auto& led : leds) {
+                led.color = col;
+            }
 
             elapsed_fade += dt;
         }
@@ -102,11 +111,31 @@ void Table::step(chrono::milliseconds dt){
         int i = 0;
         for (auto& led : leds) {
             led.update(lights);
-            colors[i] = led.color();
+            colors[i] = led.color;
             i++;
         }
 
         ledstrip.set(colors);
+    }
+
+    else if (mode == CLOSING) {
+        cout << "Closing!" << endl;
+        elapsed_fade = chrono::milliseconds(0);
+        while (elapsed_fade < fade_duration) {
+            float alpha = (float) elapsed_fade.count() / fade_duration.count();
+            int i = 0;
+            for (auto& led : leds) {
+                colors[i] = led.color.interpolate(Color::black, alpha);
+                i++;
+            }
+
+            ledstrip.set(colors);
+
+            dt = chrono::milliseconds(16);
+            elapsed_fade += dt;
+            this_thread::sleep_for(dt);
+        }
+        cout << "Bye bye!" << endl;
     }
 
 }

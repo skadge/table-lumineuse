@@ -146,4 +146,7 @@ int main(int arg, char * argv[]) {
         start = chrono::high_resolution_clock::now();
     }
 
+    table.mode = CLOSING;
+    table.step(dt); // the last stepping blocks until LEDs fade out
+
 }

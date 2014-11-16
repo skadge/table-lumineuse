@@ -14,7 +14,7 @@ static const int TABLE_HEIGHT = 500; //mm
 static const int MAX_COLOR_DISTANCE = 1000; //mm (distance max to which a light source impact LEDs)
 
 enum source_type { LIGHT = 0, SOUND  };
-enum mode_type { PLAIN = 0, COLOR_MIX  };
+enum mode_type { PLAIN = 0, COLOR_MIX, CLOSING  };
 
 class Source {
 
@@ -98,7 +98,6 @@ class LED : Actuator {
     static int last_id;
 
     int idx;
-    Color _color;
 
 public:
 
@@ -107,14 +106,14 @@ public:
 
     void update(const std::vector<std::shared_ptr<LightSource>> lights);
 
-    Color color() const {return _color;}
 
     friend std::ostream& operator<< (std::ostream &out, const LED &led);
+
+    Color color;
 };
 
 class Table {
 
-    mode_type mode;
 
     std::vector<std::shared_ptr<LightSource>> lights;
     std::array<LED, NB_LEDS> leds;
@@ -128,6 +127,8 @@ class Table {
     Color current_plain_color; // default constructor: black
 
 public:
+
+    mode_type mode;
 
     Table(): 
         mode(PLAIN),
