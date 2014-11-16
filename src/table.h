@@ -3,6 +3,7 @@
 #include <array>
 #include <cmath>
 #include <memory>
+#include <chrono>
 
 #include "ledstrip.h"
 
@@ -13,6 +14,7 @@ static const int TABLE_HEIGHT = 500; //mm
 static const int MAX_COLOR_DISTANCE = 1000; //mm (distance max to which a light source impact LEDs)
 
 enum source_type { LIGHT = 0, SOUND  };
+enum mode_type { PLAIN = 0, COLOR_MIX  };
 
 class Source {
 
@@ -112,17 +114,30 @@ public:
 
 class Table {
 
+    mode_type mode;
+
     std::vector<std::shared_ptr<LightSource>> lights;
     std::array<LED, NB_LEDS> leds;
 
     Ledstrip ledstrip;
 
+    std::chrono::milliseconds fade_duration;
+    std::chrono::milliseconds elapsed_fade;
+    bool fading;
+
+    Color current_plain_color; // default constructor: black
+
 public:
 
+    Table(): 
+        mode(PLAIN),
+        fade_duration(1000),
+        elapsed_fade(0),
+        fading(false) {}
 
     void add_light(std::shared_ptr<LightSource> light) {lights.push_back(light);}
 
-    void step(double dt);
+    void step(std::chrono::milliseconds dt = std::chrono::milliseconds(0));
 
     void show();
 

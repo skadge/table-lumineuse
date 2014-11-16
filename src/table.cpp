@@ -65,18 +65,48 @@ ostream& operator<< (ostream &out, const LED &led) {
     return out;
 }
 
-void Table::step(double dt){
+void Table::step(chrono::milliseconds dt){
 
     array<Color, NB_LEDS> colors;
 
-    int i = 0;
-    for (auto& led : leds) {
-        led.update(lights);
-        colors[i] = led.color();
-        i++;
+    if (mode == PLAIN) {
+        Color active_color;
+        if (lights.empty()) {
+            active_color = Color::white;
+        }
+        else {
+            active_color = lights.back()->color;
+        }
+
+        if (active_color != current_plain_color) {
+            if (!fading) {
+                elapsed_fade = chrono::milliseconds(0);
+                fading = true;
+            }
+            if (elapsed_fade > fade_duration) {
+                fading = false;
+                current_plain_color = active_color;
+            }
+
+            float alpha = (float) elapsed_fade.count() / fade_duration.count();
+
+            ledstrip.fill(current_plain_color.interpolate(active_color, alpha));
+
+            elapsed_fade += dt;
+        }
+
     }
 
-    ledstrip.set(colors);
+    else if (mode == COLOR_MIX) {
+        int i = 0;
+        for (auto& led : leds) {
+            led.update(lights);
+            colors[i] = led.color();
+            i++;
+        }
+
+        ledstrip.set(colors);
+    }
 
 }
 

@@ -17,7 +17,7 @@ using namespace std;
 using namespace http::server; // boost asio HHTP server
 
 static const double MAIN_LOOP_FPS=60;
-static const chrono::duration<double> main_loop_duration{1/MAIN_LOOP_FPS};
+static const chrono::milliseconds main_loop_duration{(int) (1000/MAIN_LOOP_FPS)};
 
 
 Json::Value root; // will contains the root value after parsing.
@@ -99,15 +99,15 @@ int main(int arg, char * argv[]) {
 
 
     table.add_light(src1);
-    src1->color = Color(0,255,0);
-    src1->position(500, 250, 0);
+    src1->color = Color(255,255,255);
+    //src1->position(500, 250, 0);
 
     //auto red = make_shared<LightSource>();
     //table.add_light(red);
     //red->color = Color(255,0,0);
     //red->update(900, 34, 0);
 
-    table.step(0.);
+    table.step();
     //table.show();
 
     cout << "Listening for clients..." << endl;
@@ -129,7 +129,7 @@ int main(int arg, char * argv[]) {
 
     auto start = chrono::high_resolution_clock::now();
     auto intermediate = start, end = start;
-    double dt = 0.;
+    chrono::milliseconds dt{0};
 
     while (running) {
 
@@ -141,8 +141,7 @@ int main(int arg, char * argv[]) {
         
         this_thread::sleep_for(main_loop_duration - (intermediate - start));
         end = chrono::high_resolution_clock::now();
-        dt = std::chrono::duration<double, std::milli>(end-start).count();
-        cout << "Loop duration: " << dt << "ms" << endl;
+        dt = chrono::duration_cast<chrono::milliseconds>(end-start);
 
         start = chrono::high_resolution_clock::now();
     }
