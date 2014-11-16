@@ -74,7 +74,7 @@ struct handler : public request_handler {
         //cout << root;
 
         Json::Value src = root["src"];
-        src1->update(src["x"].asInt(), src["y"].asInt(), 0);
+        src1->position(src["x"].asInt(), src["y"].asInt(), 0);
         src1->color = Color(src["value"][0].asInt(),
                             src["value"][1].asInt(),
                             src["value"][2].asInt());
@@ -88,9 +88,10 @@ struct handler : public request_handler {
 int main(int arg, char * argv[]) {
 
 
+
     table.add_light(src1);
     src1->color = Color(0,255,0);
-    src1->update(500, 250, 0);
+    src1->position(500, 250, 0);
 
     //auto red = make_shared<LightSource>();
     //table.add_light(red);

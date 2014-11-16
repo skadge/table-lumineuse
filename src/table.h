@@ -38,7 +38,7 @@ public:
         enabled = false;
     }
 
-    void update(float x, float y, float theta) {
+    void position(float x, float y, float theta) {
         _dx += _x - x; _x = x;
         _dy += _y - y; _y = y;
         _dtheta += _theta - theta; _theta = theta;
