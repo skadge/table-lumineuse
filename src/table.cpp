@@ -65,7 +65,7 @@ ostream& operator<< (ostream &out, const LED &led) {
     return out;
 }
 
-void Table::step(){
+void Table::step(double dt){
 
     array<Color, NB_LEDS> colors;
 

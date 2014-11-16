@@ -34,6 +34,14 @@ public:
 
   /// Run the server's io_service loop.
   void run();
+  
+  /// Poll the server's io_service loop.
+  void poll();
+
+  /// The io_service used to perform asynchronous operations.
+  boost::asio::io_service io_service;
+
+
 
 private:
   /// Perform an asynchronous accept operation.
@@ -41,10 +49,6 @@ private:
 
   /// Wait for a request to stop the server.
   void do_await_stop();
-
-  /// The io_service used to perform asynchronous operations.
-  boost::asio::io_service io_service_;
-
   /// The signal_set is used to register for process termination notifications.
   boost::asio::signal_set signals_;
 
@@ -63,11 +67,11 @@ private:
 
 template<typename T>
 server<T>::server(const std::string& address, const std::string& port)
-  : io_service_(),
-    signals_(io_service_),
-    acceptor_(io_service_),
+  : io_service(),
+    signals_(io_service),
+    acceptor_(io_service),
     connection_manager_(),
-    socket_(io_service_),
+    socket_(io_service),
     request_handler_()
 {
   // Register to handle the signals that indicate when the server should exit.
@@ -82,7 +86,7 @@ server<T>::server(const std::string& address, const std::string& port)
   do_await_stop();
 
   // Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
-  boost::asio::ip::tcp::resolver resolver(io_service_);
+  boost::asio::ip::tcp::resolver resolver(io_service);
   boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve({address, port});
   acceptor_.open(endpoint.protocol());
   acceptor_.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
@@ -99,8 +103,15 @@ void server<T>::run()
   // have finished. While the server is running, there is always at least one
   // asynchronous operation outstanding: the asynchronous accept call waiting
   // for new incoming connections.
-  io_service_.run();
+  io_service.run();
 }
+
+template<typename T>
+void server<T>::poll()
+{
+  io_service.poll();
+}
+
 
 template<typename T>
 void server<T>::do_accept()

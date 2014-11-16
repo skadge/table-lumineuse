@@ -1,16 +1,24 @@
 #include <string>
 #include <iostream>
+#include <chrono>
+#include <thread>
+#include <csignal>
 
 #include <json/json.h>
 
 #include "http_server/server.hpp"
 #include "http_server/request_handler.hpp"
 #include "http_server/reply.hpp" // for stock reply HTTP 202 'accepted'
+#include <boost/asio.hpp>
 
 #include "table.h"
 
 using namespace std;
 using namespace http::server; // boost asio HHTP server
+
+static const double MAIN_LOOP_FPS=60;
+static const chrono::duration<double> main_loop_duration{1/MAIN_LOOP_FPS};
+
 
 Json::Value root; // will contains the root value after parsing.
 Json::Reader reader;
@@ -19,6 +27,8 @@ struct handler;
 
 Table table;
 auto src1 = make_shared<LightSource>();
+
+bool running = true;
 
 void replaceAll(std::string& str, const std::string& from, const std::string& to) {
 
@@ -78,7 +88,6 @@ struct handler : public request_handler {
         src1->color = Color(src["value"][0].asInt(),
                             src["value"][1].asInt(),
                             src["value"][2].asInt());
-        table.step();
 
         response = reply::stock_reply(reply::accepted);
     }
@@ -98,10 +107,44 @@ int main(int arg, char * argv[]) {
     //red->color = Color(255,0,0);
     //red->update(900, 34, 0);
 
-    table.step();
-    table.show();
+    table.step(0.);
+    //table.show();
 
     cout << "Listening for clients..." << endl;
     http::server::server<handler> s("0.0.0.0", "8080");
-    s.run();
+
+    // boost.asio already captures termination signals to stop the server.
+    // I add here my own handler to also quit the main loop
+    boost::asio::signal_set signals(s.io_service);
+    signals.add(SIGINT);
+    signals.add(SIGTERM);
+    signals.add(SIGQUIT);
+
+    signals.async_wait(
+      [](boost::system::error_code /*ec*/, int /*signo*/)
+      {
+        running = false;
+      });
+
+
+    auto start = chrono::high_resolution_clock::now();
+    auto intermediate = start, end = start;
+    double dt = 0.;
+
+    while (running) {
+
+        s.poll();
+
+        table.step(dt);
+
+        intermediate = chrono::high_resolution_clock::now();
+        
+        this_thread::sleep_for(main_loop_duration - (intermediate - start));
+        end = chrono::high_resolution_clock::now();
+        dt = std::chrono::duration<double, std::milli>(end-start).count();
+        cout << "Loop duration: " << dt << "ms" << endl;
+
+        start = chrono::high_resolution_clock::now();
+    }
+
 }
