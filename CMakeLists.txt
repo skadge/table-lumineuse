@@ -21,7 +21,7 @@ pkg_check_modules(CHILITAGS chilitags)
 include_directories(${CHILITAGS_INCLUDE_DIRS})
 
 
-add_library(LPD8806 SHARED src/ledstrip.cpp src/lpd8806led.c)
+add_library(LPD8806 SHARED src/ledstrip.cpp src/lpd8806led.c src/color.cpp)
 
 add_executable( test_strip src/ledstrip.cpp src/test_ledstrip.cpp)
 target_link_libraries( test_strip LPD8806 )

@@ -2,18 +2,19 @@
 #include <vector>
 #include <iostream>
 
+#include "color.h"
 #include "lpd8806led.h"
 
 static const char *SPIDEV = "/dev/spidev0.0";
 static const int NB_LEDS = 32 * 3 + 1;
 
-class Color;
-
 class Ledstrip {
 
-  lpd8806_buffer buf;
-  int fd;
-  bool initialized;
+    lpd8806_buffer buf;
+    int fd;
+    bool initialized;
+
+    bool running_animation;
 
 public:
     Ledstrip();
@@ -26,20 +27,4 @@ public:
     void set(const std::array<Color, NB_LEDS>& colors);
 };
 
-
-class Color {
-
-    uint8_t _r, _g, _b;
-
-public:
-    Color(): _r(0), _g(0), _b(0) {}
-    Color(uint8_t r, uint8_t g, uint8_t b) : _r(r), _g(g), _b(b) {}
-
-    std::tuple<uint8_t, uint8_t, uint8_t> rgb() const {return std::make_tuple(_r, _g, _b);}
-    //std::tuple<float, float, float> hsl() const {return std::make_tuple(_r, _g, _b);}
-
-    friend std::ostream& operator<< (std::ostream &out, const Color &color);
-
-    static Color from_mix(const std::vector<std::tuple<Color, float>>& colors);
-};
 
