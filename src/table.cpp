@@ -153,3 +153,27 @@ void Table::show(){
         cout << led << endl;
     }
 }
+
+Json::Value Table::sources_to_JSON() const {
+
+    Json::Value res;
+
+    for (auto source : sources) {
+        res["src"]["id"] = source->id();
+        res["src"]["type"] = "color";
+        res["src"]["x"] = source->x();
+        res["src"]["y"] = source->y();
+        res["src"]["theta"] = source->theta();
+        uint8_t r, g, b;
+        tie(r,g,b) = source->color.rgb();
+        res["src"]["value"] = Json::arrayValue;
+        res["src"]["value"].append(r);
+        res["src"]["value"].append(g);
+        res["src"]["value"].append(b);
+
+    }
+
+    return res;
+
+
+}

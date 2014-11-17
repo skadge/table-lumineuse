@@ -7,6 +7,7 @@
 #include <cmath>
 #include <memory>
 #include <chrono>
+#include <json/json.h>
 
 #include "ledstrip.h"
 
@@ -152,6 +153,7 @@ public:
 
     void show();
 
+    Json::Value sources_to_JSON() const;
 };
 
 #endif
