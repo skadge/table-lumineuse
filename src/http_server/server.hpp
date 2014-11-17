@@ -40,6 +40,9 @@ public:
 
   /// The io_service used to perform asynchronous operations.
   boost::asio::io_service io_service;
+  
+  /// The handler for all incoming requests.
+  T request_handler;
 
 
 
@@ -61,8 +64,6 @@ private:
   /// The next socket to be accepted.
   boost::asio::ip::tcp::socket socket_;
 
-  /// The handler for all incoming requests.
-  T request_handler_;
 };
 
 template<typename T>
@@ -72,7 +73,7 @@ server<T>::server(const std::string& address, const std::string& port)
     acceptor_(io_service),
     connection_manager_(),
     socket_(io_service),
-    request_handler_()
+    request_handler()
 {
   // Register to handle the signals that indicate when the server should exit.
   // It is safe to register for the same signal multiple times in a program,
@@ -129,7 +130,7 @@ void server<T>::do_accept()
         if (!ec)
         {
           connection_manager_.start(std::make_shared<connection>(
-              std::move(socket_), connection_manager_, request_handler_));
+              std::move(socket_), connection_manager_, request_handler));
         }
 
         do_accept();

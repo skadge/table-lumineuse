@@ -1,3 +1,6 @@
+#ifndef TABLE_H
+#define TABLE_H
+
 #include <tuple>
 #include <vector>
 #include <array>
@@ -20,11 +23,16 @@ class Source {
 
 protected:
 
+
+    int _id;
+
     float _x, _y, _theta;
     float _dx, _dy, _dtheta;
     bool enabled;
 
 public:
+
+    Source(int id) : _id(id) {}
 
     // virtual destructor -> polymorphic class
     virtual ~Source() {}
@@ -46,6 +54,8 @@ public:
         _dtheta += _theta - theta; _theta = theta;
     }
 
+    int id() const {return _id;}
+
     float x() const {return _x;}
     float y() const {return _y;}
     float theta() const {return _theta;}
@@ -57,10 +67,8 @@ public:
 
 class LightSource : public Source {
 
-
-
 public:
-    LightSource() {
+    LightSource(int id) : Source(id) {
         type = LIGHT;
     }
 
@@ -75,7 +83,7 @@ protected:
     float volume;
 
 public:
-    SoundSource() {
+    SoundSource(int id) : Source(id) {
         type = SOUND;
     }
 
@@ -115,7 +123,7 @@ public:
 class Table {
 
 
-    std::vector<std::shared_ptr<LightSource>> lights;
+    std::vector<std::shared_ptr<LightSource>> sources;
     std::array<LED, NB_LEDS> leds;
 
     Ledstrip ledstrip;
@@ -136,10 +144,14 @@ public:
         elapsed_fade(0),
         fading(false) {}
 
-    void add_light(std::shared_ptr<LightSource> light) {lights.push_back(light);}
+    void add_light(std::shared_ptr<LightSource> source) {sources.push_back(source);}
 
     void step(std::chrono::milliseconds dt = std::chrono::milliseconds(0));
+
+    std::shared_ptr<LightSource> get_source(int id);
 
     void show();
 
 };
+
+#endif

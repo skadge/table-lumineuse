@@ -74,11 +74,11 @@ void Table::step(chrono::milliseconds dt){
 
     if (mode == PLAIN) {
         Color active_color;
-        if (lights.empty()) {
+        if (sources.empty()) {
             active_color = Color::white;
         }
         else {
-            active_color = lights.back()->color;
+            active_color = sources.back()->color;
         }
 
         if (active_color != current_plain_color) {
@@ -110,7 +110,7 @@ void Table::step(chrono::milliseconds dt){
     else if (mode == COLOR_MIX) {
         int i = 0;
         for (auto& led : leds) {
-            led.update(lights);
+            led.update(sources);
             colors[i] = led.color;
             i++;
         }
@@ -138,6 +138,13 @@ void Table::step(chrono::milliseconds dt){
         cout << "Bye bye!" << endl;
     }
 
+}
+
+shared_ptr<LightSource> Table::get_source(int id) {
+    for (auto source : sources) {
+        if (source->id() == id) return source;
+    }
+    return nullptr;
 }
 
 void Table::show(){

@@ -23,7 +23,7 @@ target_link_libraries( test_strip LPD8806 )
 
 file(GLOB http_server src/http_server/*.cpp)
 
-add_executable( table src/server.cpp src/table.cpp ${http_server})
+add_executable( table src/main.cpp src/handler.cpp src/table.cpp ${http_server})
 target_link_libraries( table LPD8806 ${Boost_LIBRARIES} ${JSONCPP_LIBRARIES} )
 
 #add_executable( server ${http_server})

@@ -1,3 +1,6 @@
+#ifndef LEDSTRIP_H
+#define LEDSTRIP_H
+
 #include <tuple>
 #include <vector>
 #include <iostream>
@@ -28,3 +31,4 @@ public:
 };
 
 
+#endif
