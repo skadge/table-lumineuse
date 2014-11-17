@@ -9,18 +9,7 @@
 #include "table.h"
 
 using namespace std;
-using namespace http::server; // boost asio HHTP server
-
-
-//void replaceAll(std::string& str, const std::string& from, const std::string& to) {
-//
-//    size_t start_pos = 0;
-//    while((start_pos = str.find(from, start_pos)) != std::string::npos) {
-//        str.replace(start_pos, from.length(), to);
-//        start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
-//    }
-//}
-
+using namespace http::server; // boost asio HTTP server
 
 void handler::handle_request(const request& request, reply& response)
 {
@@ -42,7 +31,22 @@ void handler::handle_request(const request& request, reply& response)
         return;
     }
 
-    if (request_path.find("content=") == std::string::npos)
+    if (request_path.find("content=") != std::string::npos)
+    {
+        string query = request_path.substr(request_path.find("content=") + 8);
+        bool parsingSuccessful = reader.parse( query, root );
+        if (!parsingSuccessful) {
+            cerr << "Invalid command: " << query << endl;
+            response = reply::stock_reply(reply::bad_request);
+            return;
+        }
+        response = process_new_pose(root);
+    }
+    else if (request_path.find("state") != std::string::npos)
+    {
+        response = process_get_state();
+    }
+    else
     {
         cerr << "URI must contains a 'content': " << request_path << endl;
         response = reply::stock_reply(reply::bad_request);
@@ -51,26 +55,35 @@ void handler::handle_request(const request& request, reply& response)
 
 
 
-    string query = request_path.substr(request_path.find("content=") + 8);
-    bool parsingSuccessful = reader.parse( query, root );
-    if (!parsingSuccessful) {
-        cerr << "Invalid command: " << query << endl;
-        response = reply::stock_reply(reply::bad_request);
-        return;
-    }
+}
 
+reply handler::process_new_pose(const Json::Value& msg)
+{
     //cout << "Command successfully parsed:\n";
-    //cout << root;
+    //cout << msg;
 
-    Json::Value src = root["src"];
+    Json::Value src = msg["src"];
     int id = src["id"].asInt();
     auto source = table->get_source(id);
-    source->position(src["x"].asInt(), src["y"].asInt(), 0);
-    source->color = Color(src["value"][0u].asInt(),
-            src["value"][1u].asInt(),
-            src["value"][2u].asInt());
+    if (source) {
+        source->position(src["x"].asInt(), src["y"].asInt(), 0);
+        source->color = Color(src["value"][0u].asInt(),
+                src["value"][1u].asInt(),
+                src["value"][2u].asInt());
 
-    response = reply::stock_reply(reply::accepted);
+        return reply::stock_reply(reply::accepted);
+    }
+    else
+    {
+        cerr << "Invalid command: Unknown source " << id << endl;
+        return reply::stock_reply(reply::bad_request);
+    }
+}
+
+reply handler::process_get_state()
+{
+    return reply::json_reply(table->sources_to_JSON());
+
 }
 
 

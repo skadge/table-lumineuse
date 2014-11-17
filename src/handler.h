@@ -20,6 +20,10 @@ public:
     void set_table(std::shared_ptr<Table> table) {this->table = table;}
 
 private:
+
+    http::server::reply process_new_pose(const Json::Value& msg);
+    http::server::reply process_get_state();
+
     Json::Value root; // will contains the root value after parsing.
     Json::Reader reader;
 
