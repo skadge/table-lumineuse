@@ -243,11 +243,29 @@ reply reply::stock_reply(reply::status_type status)
   reply rep;
   rep.status = status;
   rep.content = stock_replies::to_string(status);
-  rep.headers.resize(2);
+  rep.headers.resize(3);
   rep.headers[0].name = "Content-Length";
   rep.headers[0].value = std::to_string(rep.content.size());
   rep.headers[1].name = "Content-Type";
   rep.headers[1].value = "text/html";
+  rep.headers[2].name = "Access-Control-Allow-Origin";
+  rep.headers[2].value = "*";
+  return rep;
+}
+
+reply reply::json_reply(const Json::Value& object, status_type status)
+{
+  Json::FastWriter writer;
+  reply rep;
+  rep.status = status;
+  rep.content = writer.write(object);
+  rep.headers.resize(3);
+  rep.headers[0].name = "Content-Length";
+  rep.headers[0].value = std::to_string(rep.content.size());
+  rep.headers[1].name = "Content-Type";
+  rep.headers[1].value = "application/json";
+  rep.headers[2].name = "Access-Control-Allow-Origin";
+  rep.headers[2].value = "*";
   return rep;
 }
 

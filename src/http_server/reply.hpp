@@ -16,6 +16,8 @@
 #include <boost/asio.hpp>
 #include "header.hpp"
 
+#include <json/json.h>
+
 namespace http {
 namespace server {
 
@@ -56,6 +58,10 @@ struct reply
 
   /// Get a stock reply.
   static reply stock_reply(status_type status);
+
+  /// Get a reply from a JSON object
+  static reply json_reply(const Json::Value& object, status_type status = ok);
+
 };
 
 } // namespace server
