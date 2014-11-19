@@ -33,6 +33,9 @@ find_package(raspicam)
 if (${raspicam_FOUND})
     include_directories(${raspicam_INCLUDE_DIRS})
 
+    add_executable( markers_acquisition tools/markers_acquisition.cpp)
+    target_link_libraries( markers_acquisition ${OpenCV_LIBRARIES} ${raspicam_CV_LIBS})
+
     pkg_check_modules(CHILITAGS chilitags)
     include_directories(${CHILITAGS_INCLUDE_DIRS})
 
