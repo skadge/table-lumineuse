@@ -7,6 +7,8 @@
 
 #include <iostream>
 
+#define DEBUG
+
 using namespace std;
 using namespace cv;
 
@@ -45,7 +47,9 @@ void detect_circles(InputArray img, OutputArray circles) {
                  7, // min radius
                  11); // max radius
 
+#ifdef DEBUG
     cout << "Found " << circles.size() << " circles" << endl;
+#endif
 
 }
 
@@ -111,6 +115,7 @@ void decode_marker(InputArray img, Vec3f circle) {
 
         auto circle = circles[0];
 
+#ifdef DEBUG
         Mat cimg;
         cvtColor(tag, cimg, COLOR_GRAY2BGR);
         for (auto c : circles) {
@@ -142,6 +147,7 @@ void decode_marker(InputArray img, Vec3f circle) {
 
         imshow("Tag", ctag);
         waitKey(0);
+#endif
     }
 }
 
@@ -154,31 +160,34 @@ int main ( int argc,char **argv ) {
 
     rawimage = imread(argv[2], 0);
 
+    auto start = getTickCount();
+
     prepare(rawimage, img);
 
     cvtColor(img, cimg, COLOR_GRAY2BGR);
 
     vector<Vec3f> circles;
+
     detect_circles(img, circles);
 
+
     for (auto c : circles) {
+#ifdef DEBUG
         Point center(cvRound(c[0]), cvRound(c[1]));
         int radius = cvRound(c[2]);
         // circle center
         circle( cimg, center, 3, Scalar(0,255,0), -1, 8, 0 );
         // circle outline
         circle( cimg, center, radius, Scalar(0,0,255), 3, 8, 0 );
-
+#endif
         decode_marker(img, c);
     }
+
+    cout << "It took " << (getTickCount() - start) * 1000./getTickFrequency() << "ms" << endl;
 
     //imshow("detected circles",cimg);
     //waitKey(0);
 
-
-
-    //imshow("undistorted", imageUndistorted);
-    //waitKey(0);
     return 0;
 }
 
