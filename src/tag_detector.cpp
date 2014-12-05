@@ -7,6 +7,8 @@
 
 #include <iostream>
 
+#define PI 3.14159265
+
 #define DEBUG
 
 using namespace std;
@@ -25,13 +27,13 @@ Size readCalibration(const string &filename) {
     return size;
 }
 
-void prepare(InputArray rawimage, OutputArray img) {
+void prepare(InputArray rawimage, OutputArray undistorted_img, OutputArray small_img) {
 
 
     auto newcamera = getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, rawimage.size(), 0); 
-    undistort(rawimage, img, cameraMatrix, distCoeffs, newcamera);
+    undistort(rawimage, undistorted_img, cameraMatrix, distCoeffs, newcamera);
 
-    resize(img, img, Size(320,240));
+    resize(undistorted_img, small_img, Size(320,240));
 
 
 }
@@ -89,7 +91,47 @@ Rect circle2rect(Vec3f circle, double scaling = 1.0) {
     return roi;
 }
 
+void unfold_circle(InputArray circle) {
+
+    const int NB_SLICES = 32;
+
+    int radius = circle.size().width / 2; // we expect the circle ROI to be squarish a this point
+
+    vector<int> pattern(radius);
+    vector<int> orientation(NB_SLICES);
+
+    for (int i = 0; i < NB_SLICES; i++) {
+        for (int r = 0; r < radius; r++) {
+            int x = cvRound(r * cos(i * 2.f * PI / NB_SLICES) + radius);
+            int y = cvRound(r * sin(i * 2.f * PI / NB_SLICES) + radius);
+            auto val = circle.getMat().at<unsigned char>(x, y);
+            pattern[r] += val;
+            orientation[i] += val;
+        }
+    }
+
+    cout << endl << "Pattern:" << endl;
+    for (int i = 0; i < radius; i++) {
+        pattern[i] = pattern[i] / NB_SLICES; 
+        cout << ( (pattern[i] > 170) ? " " : ((pattern[i] < 140) ? "-" : "~"));
+    }
+
+    cout << endl << endl << "Orientation: " << endl;
+
+    for (int i = 0; i < NB_SLICES; i++) {
+        orientation[i] = orientation[i] / radius; 
+        cout << cvRound(i * 360./NB_SLICES) << " deg: " << orientation[i] << ((orientation[i] > 200) ? "  [x]":"")<< endl;
+    }
+
+
+}
+
+
 void decode_marker(InputArray img, Vec3f circle) {
+
+    circle[0] *=2;
+    circle[1] *=2;
+    circle[2] *=2;
 
     auto roi = circle2rect(circle, 2);
     // make sure our ROI remains inside the image
@@ -99,21 +141,30 @@ void decode_marker(InputArray img, Vec3f circle) {
 
     //equalizeHist(tag, tag);
     //show_hist(tag);
-    adaptiveThreshold(tag, tag, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY,7,0);
- 
+    adaptiveThreshold(tag, tag, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY,15,0);
+
+#ifdef DEBUG
+    imshow("Raw tag", tag);
+#endif
+
     vector<Vec3f> circles;
     HoughCircles(tag, circles,
                  HOUGH_GRADIENT,
                  1, // dp
                  20, // min dist
                  30, // param 1
-                 8, // param 2
-                 8, // min radius
-                 10); // max radius
+                 9, // param 2
+                 16, // min radius
+                 20); // max radius
 
     if (!circles.empty()) {
 
         auto circle = circles[0];
+
+        roi = circle2rect(circle) & Rect(Point(0,0), tag.size());
+        Mat ctag = tag(roi);
+
+        unfold_circle(ctag);
 
 #ifdef DEBUG
         Mat cimg;
@@ -128,9 +179,6 @@ void decode_marker(InputArray img, Vec3f circle) {
 
         }
 
-        roi = circle2rect(circle) & Rect(Point(0,0), tag.size());
-        Mat ctag = cimg(roi);
-
 
     
         //Moments m = moments(tag, true);
@@ -142,18 +190,20 @@ void decode_marker(InputArray img, Vec3f circle) {
         //Mat destImg;
         //tag.copyTo(destImg, mask);
         //
-        resize(ctag, ctag, Size(), 5, 5);
+        resize(cimg, cimg, Size(), 5, 5);
 
 
-        imshow("Tag", ctag);
-        waitKey(0);
+        imshow("Tag", cimg);
 #endif
     }
+#ifdef DEBUG
+        waitKey(0);
+#endif
 }
 
 int main ( int argc,char **argv ) {
 
-    Mat rawimage, img;
+    Mat rawimage, img, small;
     Mat cimg;
 
     readCalibration(argv[1]);
@@ -162,13 +212,13 @@ int main ( int argc,char **argv ) {
 
     auto start = getTickCount();
 
-    prepare(rawimage, img);
+    prepare(rawimage, img, small);
 
     cvtColor(img, cimg, COLOR_GRAY2BGR);
 
     vector<Vec3f> circles;
 
-    detect_circles(img, circles);
+    detect_circles(small, circles);
 
 
     for (auto c : circles) {
