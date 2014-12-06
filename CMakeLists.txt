@@ -26,7 +26,7 @@ file(GLOB http_server src/http_server/*.cpp)
 add_executable( table src/main.cpp src/handler.cpp src/table.cpp ${http_server})
 target_link_libraries( table LPD8806 ${Boost_LIBRARIES} ${JSONCPP_LIBRARIES} )
 
-add_executable( tags src/tag_detector.cpp)
+add_executable( tags src/detector.cpp src/tag_detector.cpp)
 target_link_libraries( tags ${OpenCV_LIBRARIES} )
 
 
