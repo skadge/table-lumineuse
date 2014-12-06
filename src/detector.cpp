@@ -4,6 +4,7 @@
 
 #include <opencv2/highgui/highgui.hpp> //for FileStorage
 
+#include <bitset>
 #include <iostream>
 
 #include "detector.h"
@@ -94,13 +95,16 @@ void Detector::unfold_circle(InputArray circle, Marker& marker) {
 
     int radius = circle.size().width / 2; // we expect the circle ROI to be squarish a this point
 
-    vector<int> pattern(radius);
+    vector<int> pattern(RADIUS_RESOLUTION);
+    int32_t encoded_pattern = 0;
     vector<int> orientation(NB_RADII);
 
+    double radius_scaling = (double) radius / RADIUS_RESOLUTION;
+
     for (int i = 0; i < NB_RADII; i++) {
-        for (int r = 0; r < radius; r++) {
-            int x = cvRound(r * cos(i * 2.f * PI / NB_RADII) + radius);
-            int y = cvRound(r * sin(i * 2.f * PI / NB_RADII) + radius);
+        for (int r = 0; r < RADIUS_RESOLUTION; r++) {
+            int x = cvRound(r * radius_scaling * cos(i * 2.f * PI / NB_RADII) + radius);
+            int y = cvRound(r * radius_scaling * sin(i * 2.f * PI / NB_RADII) + radius);
             auto val = circle.getMat().at<unsigned char>(x, y);
             pattern[r] += val;
             orientation[i] += val;
@@ -110,25 +114,55 @@ void Detector::unfold_circle(InputArray circle, Marker& marker) {
 #ifdef DEBUG
     cout << endl << "Pattern:" << endl;
 #endif
-    for (int i = 0; i < radius; i++) {
+    for (int i = 0; i < RADIUS_RESOLUTION; i++) {
         pattern[i] = pattern[i] / NB_RADII; 
-#ifdef DEBUG
-        cout << ( (pattern[i] > 170) ? " " : ((pattern[i] < 140) ? "-" : "~"));
-#endif
+        if (pattern[i] < 150) {
+            encoded_pattern = encoded_pattern | 1 << (RADIUS_RESOLUTION - i);
+        }
     }
+
+
+    for (const auto& kv : MARKERS) {
+#ifdef DEBUG
+        cout << "Marker " << (int) kv.first << ": " << endl;
+        cout << "  " << bitset<25>(encoded_pattern) << endl;
+        cout << "^ " << bitset<25>(kv.second) << endl;
+        cout << "= " << bitset<25>(encoded_pattern ^ kv.second);
+        cout << " (" << (int) count_bits(encoded_pattern ^ kv.second) << " '1's)" << endl;
+#endif
+        // the XOR returns '1's for each difference with the pattern.
+        // We then count the nb of differences, and keep only when < 30%
+        if (count_bits(encoded_pattern ^ kv.second) < 0.3 * RADIUS_RESOLUTION) {
+            marker.valid = true;
+            marker.id = kv.first;
+            break;
+        }
+    }
+
+    // no pattern recognized? no need to check the orientation!
+    if (!marker.valid) return;
 
 #ifdef DEBUG
     cout << endl << endl << "Orientation: " << endl;
 #endif
 
+    float theta_acc = 0.f;
+    int nb_thetas = 0;
+
     for (int i = 0; i < NB_RADII; i++) {
-        orientation[i] = orientation[i] / radius; 
+        int theta = orientation[i] / RADIUS_RESOLUTION; 
+        if (theta > 200) {
+            theta_acc += i * 360./NB_RADII; // deg
+            nb_thetas++;
+        }
+
 #ifdef DEBUG
-        cout << cvRound(i * 360./NB_RADII) << " deg: " << orientation[i] << ((orientation[i] > 200) ? "  [x]":"")<< endl;
+        cout << cvRound(i * 360./NB_RADII) << " deg: " << theta << ((theta > 200) ? "  [x]":"")<< endl;
 #endif
     }
 
-    marker.valid = true;
+
+    marker.theta = theta_acc / nb_thetas;
 
 
 }
@@ -137,6 +171,10 @@ void Detector::unfold_circle(InputArray circle, Marker& marker) {
 Marker Detector::decode_marker(InputArray img, Vec3f approx_circle) {
 
     Marker marker;
+
+    // TODO: improve accuracy by using x,y from refined circle below
+    marker.x = approx_circle[0];
+    marker.y = approx_circle[1];
 
     auto roi = circle2rect(approx_circle, 2);
     // make sure our ROI remains inside the image
@@ -189,6 +227,11 @@ Marker Detector::decode_marker(InputArray img, Vec3f approx_circle) {
     waitKey(0);
 #endif
 
+#ifdef DEBUG
+    if (marker.valid) {
+        cout << "Found marker " << (int) marker.id << " at (" << marker.x << ", " << marker.y << ", theta=" << marker.theta << " deg)" << endl;
+    }
+#endif
     return marker;
 }
 

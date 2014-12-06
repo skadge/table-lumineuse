@@ -27,6 +27,7 @@ int main ( int argc,char **argv ) {
     int nb_markers = (argc - 2) * test_markers.size();
 
     int found_markers = 0;
+    int false_positive = 0;
 
     for (int i = 2; i < argc; i++) {
         rawimage = imread(argv[i], 0);
@@ -45,6 +46,9 @@ int main ( int argc,char **argv ) {
                 && abs(target[2] - marker.theta) < EPSILON) {
                 found_markers++;
             }
+            else {
+                false_positive++;
+            }
 
         }
 
@@ -52,7 +56,7 @@ int main ( int argc,char **argv ) {
         cout << argv[i] << ": " << markers.size() << " markers in " << (getTickCount() - start) * 1000./getTickFrequency() << "ms" << endl;
     }
 
-    cout << "Found " << found_markers << " out of " << nb_markers << " (" << 100. * found_markers / nb_markers << "%)." << endl;
+    cout << "Found " << found_markers << " out of " << nb_markers << " (" << 100. * found_markers / nb_markers << "%), and " << false_positive << " false positives" << endl;
 
     return 0;
 }
