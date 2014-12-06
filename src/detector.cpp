@@ -90,49 +90,55 @@ Rect Detector::circle2rect(Vec3f circle, double scaling) {
     return roi;
 }
 
-void Detector::unfold_circle(InputArray circle) {
-
-    const int NB_SLICES = 32;
+void Detector::unfold_circle(InputArray circle, Marker& marker) {
 
     int radius = circle.size().width / 2; // we expect the circle ROI to be squarish a this point
 
     vector<int> pattern(radius);
-    vector<int> orientation(NB_SLICES);
+    vector<int> orientation(NB_RADII);
 
-    for (int i = 0; i < NB_SLICES; i++) {
+    for (int i = 0; i < NB_RADII; i++) {
         for (int r = 0; r < radius; r++) {
-            int x = cvRound(r * cos(i * 2.f * PI / NB_SLICES) + radius);
-            int y = cvRound(r * sin(i * 2.f * PI / NB_SLICES) + radius);
+            int x = cvRound(r * cos(i * 2.f * PI / NB_RADII) + radius);
+            int y = cvRound(r * sin(i * 2.f * PI / NB_RADII) + radius);
             auto val = circle.getMat().at<unsigned char>(x, y);
             pattern[r] += val;
             orientation[i] += val;
         }
     }
 
+#ifdef DEBUG
     cout << endl << "Pattern:" << endl;
+#endif
     for (int i = 0; i < radius; i++) {
-        pattern[i] = pattern[i] / NB_SLICES; 
+        pattern[i] = pattern[i] / NB_RADII; 
+#ifdef DEBUG
         cout << ( (pattern[i] > 170) ? " " : ((pattern[i] < 140) ? "-" : "~"));
+#endif
     }
 
+#ifdef DEBUG
     cout << endl << endl << "Orientation: " << endl;
+#endif
 
-    for (int i = 0; i < NB_SLICES; i++) {
+    for (int i = 0; i < NB_RADII; i++) {
         orientation[i] = orientation[i] / radius; 
-        cout << cvRound(i * 360./NB_SLICES) << " deg: " << orientation[i] << ((orientation[i] > 200) ? "  [x]":"")<< endl;
+#ifdef DEBUG
+        cout << cvRound(i * 360./NB_RADII) << " deg: " << orientation[i] << ((orientation[i] > 200) ? "  [x]":"")<< endl;
+#endif
     }
+
+    marker.valid = true;
 
 
 }
 
 
-void Detector::decode_marker(InputArray img, Vec3f circle) {
+Marker Detector::decode_marker(InputArray img, Vec3f approx_circle) {
 
-    circle[0] *=2;
-    circle[1] *=2;
-    circle[2] *=2;
+    Marker marker;
 
-    auto roi = circle2rect(circle, 2);
+    auto roi = circle2rect(approx_circle, 2);
     // make sure our ROI remains inside the image
     roi = roi & Rect(Point(0,0), img.size());
 
@@ -143,7 +149,7 @@ void Detector::decode_marker(InputArray img, Vec3f circle) {
     adaptiveThreshold(tag, tag, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY,15,0);
 
 #ifdef DEBUG
-    imshow("Raw tag", tag);
+    imshow("Tag after thresholding", tag);
 #endif
 
     vector<Vec3f> circles;
@@ -156,51 +162,39 @@ void Detector::decode_marker(InputArray img, Vec3f circle) {
                  16, // min radius
                  20); // max radius
 
-    if (!circles.empty()) {
+    if (circles.empty()) return marker; // 'marker.valid' is false by default
 
-        auto circle = circles[0];
 
-        roi = circle2rect(circle) & Rect(Point(0,0), tag.size());
-        Mat ctag = tag(roi);
+    auto circle = circles[0];
 
-        unfold_circle(ctag);
+    roi = circle2rect(circle) & Rect(Point(0,0), tag.size());
+    Mat ctag = tag(roi);
+
+    unfold_circle(ctag, marker);
 
 #ifdef DEBUG
-        Mat cimg;
-        cvtColor(tag, cimg, COLOR_GRAY2BGR);
-        for (auto c : circles) {
-            Point center(cvRound(c[0]), cvRound(c[1]));
-            int radius = cvRound(c[2]);
-            // circle center
-            cv::circle( cimg, center, 1, Scalar(0,255,0));
-            // circle outline
-            cv::circle( cimg, center, radius, Scalar(0,0,255), 1);
-
-        }
-
-
-    
-        //Moments m = moments(tag, true);
-        //Point p(m.m10/m.m00, m.m01/m.m00);
-        //cv::circle(tag, p, 1, Scalar(128,0,0));
-        //Mat mask = Mat::zeros(tag.size(), CV_8UC1);
-        //cv::circle(mask, p, 9, Scalar(255,255,255), -1);
-
-        //Mat destImg;
-        //tag.copyTo(destImg, mask);
-        //
-        resize(cimg, cimg, Size(), 5, 5);
-
-
-        imshow("Tag", cimg);
-#endif
+    Mat cimg;
+    cvtColor(tag, cimg, COLOR_GRAY2BGR);
+    for (auto c : circles) {
+        Point center(cvRound(c[0]), cvRound(c[1]));
+        int radius = cvRound(c[2]);
+        // circle center
+        cv::circle( cimg, center, 1, Scalar(0,255,0));
+        // circle outline
+        cv::circle( cimg, center, radius, Scalar(0,0,255), 1);
     }
-#ifdef DEBUG
-        waitKey(0);
+
+    resize(cimg, cimg, Size(), 5, 5);
+    imshow("Tag", cimg);
+    waitKey(0);
 #endif
+
+    return marker;
 }
 
-void Detector::find_markers(cv::InputArray rawimage, const std::string& calibration) {
+vector<Marker> Detector::find_markers(cv::InputArray rawimage, const std::string& calibration) {
+
+    vector<Marker> markers;
 
     Mat img, small;
     vector<Vec3f> circles;
@@ -224,8 +218,18 @@ void Detector::find_markers(cv::InputArray rawimage, const std::string& calibrat
         // circle outline
         circle( cimg, center, radius, Scalar(0,0,255), 3, 8, 0 );
 #endif
-        decode_marker(img, c);
+
+        // back from 320x240 to 640x480
+        c[0] *=2;
+        c[1] *=2;
+        c[2] *=2;
+
+        Marker marker = decode_marker(img, c);
+
+        if(marker.valid) markers.push_back(marker);
+
     }
 
+    return markers;
 }
 

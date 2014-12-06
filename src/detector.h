@@ -3,7 +3,15 @@
 
 #include <opencv2/core/core.hpp>
 #include <map>
+#include <vector>
 #include <string>
+
+struct Marker {
+    bool valid = false;
+    unsigned char id;
+    float theta;
+    unsigned int x, y;
+};
 
 class Detector {
 
@@ -15,11 +23,11 @@ public:
     void detect_circles(cv::InputArray img, cv::OutputArray circles);
 
 
-    void unfold_circle(cv::InputArray circle);
+    void unfold_circle(cv::InputArray circle, Marker& marker);
 
-    void decode_marker(cv::InputArray img, cv::Vec3f circle);
+    Marker decode_marker(cv::InputArray img, cv::Vec3f circle);
 
-    void find_markers(cv::InputArray img, const std::string& calibration);
+    std::vector<Marker> find_markers(cv::InputArray img, const std::string& calibration);
 
 private:
 
