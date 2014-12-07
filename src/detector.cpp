@@ -232,7 +232,7 @@ Marker Detector::decode_marker(InputArray img, Vec3f approx_circle) {
     imshow("Tag after dilation", tag);
     
     Mat toto;
-    Canny(tag, toto, 20, 10);
+    Canny(tag, toto, 100, 50);
     imshow("After canny", toto);
 #endif
 
@@ -240,12 +240,12 @@ Marker Detector::decode_marker(InputArray img, Vec3f approx_circle) {
     vector<Vec3f> circles;
     HoughCircles(tag, circles,
                  HOUGH_GRADIENT,
-                 2, // dp
+                 2.2, // dp
                  20, // min dist
                  20, // param 1
-                 20, // param 2
-                 17, // min radius
-                 20); // max radius
+                 10, // param 2
+                 16, // min radius
+                 19); // max radius
 
     if (circles.empty()) return marker; // 'marker.valid' is false by default
 
@@ -260,14 +260,14 @@ Marker Detector::decode_marker(InputArray img, Vec3f approx_circle) {
 #ifdef DEBUG
     Mat cimg;
     cvtColor(tag, cimg, COLOR_GRAY2BGR);
-    Point center(cvRound(circle[0]), cvRound(circle[1]));
-    int radius = cvRound(circle[2]);
+    resize(cimg, cimg, Size(), 5, 5);
+    Point center(cvRound(circle[0] * 5), cvRound(circle[1] * 5));
+    int radius = cvRound(circle[2] * 5);
     // circle center
     cv::circle( cimg, center, 1, Scalar(0,255,0));
     // circle outline
     cv::circle( cimg, center, radius, Scalar(0,0,255), 1);
 
-    resize(cimg, cimg, Size(), 5, 5);
     imshow("Tag", cimg);
 #endif
 

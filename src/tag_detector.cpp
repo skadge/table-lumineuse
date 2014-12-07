@@ -11,7 +11,7 @@ using namespace cv;
 
 // id, x, y, theta (deg)
 const map<char, array<int, 3>> test_markers {
-    {1, {{81, 223, 290}}},
+    {1, {{81, 223, 285}}},
     {2, {{441, 249, 253}}},
     {3, {{197, 67, 225}}},
     {4, {{583, 45, 278}}}
