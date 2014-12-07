@@ -124,13 +124,23 @@ void Detector::unfold_circle(InputArray circle, Marker& marker) {
 #ifdef DEBUG
     cout << endl << "Pattern:" << endl;
 #endif
+    unsigned char nb_fuzzy = 0;
     for (int i = 0; i < RADIUS_RESOLUTION; i++) {
         pattern[i] = pattern[i] / NB_RADII; 
         if (pattern[i] < 150) {
             encoded_pattern = encoded_pattern | 1 << (RADIUS_RESOLUTION - i);
         }
+        if (pattern[i] > 120 && pattern[i] < 170) {
+            nb_fuzzy++;
+        }
     }
 
+
+#ifdef DEBUG
+    cout << "Nb fuzzy:" << (int) nb_fuzzy << endl;
+#endif
+    // if many radii are 'fuzzy', we are probably seeing noise.
+    if (nb_fuzzy > 0.2 * RADIUS_RESOLUTION) return;
 
     unsigned char current_best = 0;
     unsigned char best_score = RADIUS_RESOLUTION;
