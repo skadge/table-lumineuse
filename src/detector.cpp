@@ -16,6 +16,13 @@
 using namespace std;
 using namespace cv;
 
+Detector::Detector() :
+        TABLE_ROI(30, 38, 609, 325), // x, y, width, height
+        MORPHOLOGICAL_ELEMENT(getStructuringElement( 
+                MORPH_ELLIPSE, Size( 3, 3 ), Point(1, 1)))
+{
+}
+
 Size Detector::readCalibration(const string &filename) {
     Size size;
     FileStorage fs(filename, cv::FileStorage::READ);
@@ -29,11 +36,14 @@ Size Detector::readCalibration(const string &filename) {
 
 void Detector::prepare(InputArray rawimage, OutputArray undistorted_img, OutputArray small_img) {
 
+    Mat tmp_img;
 
     auto newcamera = getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, rawimage.size(), 0); 
-    undistort(rawimage, undistorted_img, cameraMatrix, distCoeffs, newcamera);
+    undistort(rawimage, tmp_img, cameraMatrix, distCoeffs, newcamera);
 
-    resize(undistorted_img, small_img, Size(320,240));
+    tmp_img(TABLE_ROI).copyTo(undistorted_img);
+
+    resize(undistorted_img, small_img, Size(), 0.5, 0.5);
 
 
 }
@@ -122,6 +132,8 @@ void Detector::unfold_circle(InputArray circle, Marker& marker) {
     }
 
 
+    unsigned char current_best = 0;
+    unsigned char best_score = RADIUS_RESOLUTION;
     for (const auto& kv : MARKERS) {
 #ifdef DEBUG
         cout << "Marker " << (int) kv.first << ": " << endl;
@@ -132,12 +144,18 @@ void Detector::unfold_circle(InputArray circle, Marker& marker) {
 #endif
         // the XOR returns '1's for each difference with the pattern.
         // We then count the nb of differences, and keep only when < 30%
-        if (count_bits(encoded_pattern ^ kv.second) < 0.3 * RADIUS_RESOLUTION) {
+        unsigned char score = count_bits(encoded_pattern ^ kv.second);
+
+        if (score < 0.3 * RADIUS_RESOLUTION) {
             marker.valid = true;
-            marker.id = kv.first;
-            break;
+
+            if (score < best_score) {
+                best_score = score;
+                current_best = kv.first;
+            }
         }
     }
+    marker.id = current_best;
 
     // no pattern recognized? no need to check the orientation!
     if (!marker.valid) return;
@@ -148,16 +166,24 @@ void Detector::unfold_circle(InputArray circle, Marker& marker) {
 
     float theta_acc = 0.f;
     int nb_thetas = 0;
+    int theta_max = 0;
+
+    // get the max angle
+    for (int i = 0; i < NB_RADII; i++) {
+        int theta = orientation[i] / RADIUS_RESOLUTION; 
+        if (theta > theta_max) theta_max = theta;
+    }
 
     for (int i = 0; i < NB_RADII; i++) {
         int theta = orientation[i] / RADIUS_RESOLUTION; 
-        if (theta > 200) {
+
+        if (theta > 0.9 * theta_max) {
             theta_acc += i * 360./NB_RADII; // deg
             nb_thetas++;
         }
 
 #ifdef DEBUG
-        cout << cvRound(i * 360./NB_RADII) << " deg: " << theta << ((theta > 200) ? "  [x]":"")<< endl;
+        cout << cvRound(i * 360./NB_RADII) << " deg: " << theta << ((theta > theta_max * 0.9) ? "  [x]":"")<< endl;
 #endif
     }
 
@@ -190,14 +216,25 @@ Marker Detector::decode_marker(InputArray img, Vec3f approx_circle) {
     imshow("Tag after thresholding", tag);
 #endif
 
+    dilate(tag, tag, MORPHOLOGICAL_ELEMENT);
+    erode(tag, tag, MORPHOLOGICAL_ELEMENT);
+#ifdef DEBUG
+    imshow("Tag after dilation", tag);
+    
+    Mat toto;
+    Canny(tag, toto, 20, 10);
+    imshow("After canny", toto);
+#endif
+
+
     vector<Vec3f> circles;
     HoughCircles(tag, circles,
                  HOUGH_GRADIENT,
-                 1, // dp
+                 2, // dp
                  20, // min dist
-                 30, // param 1
-                 9, // param 2
-                 16, // min radius
+                 20, // param 1
+                 20, // param 2
+                 17, // min radius
                  20); // max radius
 
     if (circles.empty()) return marker; // 'marker.valid' is false by default
@@ -213,24 +250,22 @@ Marker Detector::decode_marker(InputArray img, Vec3f approx_circle) {
 #ifdef DEBUG
     Mat cimg;
     cvtColor(tag, cimg, COLOR_GRAY2BGR);
-    for (auto c : circles) {
-        Point center(cvRound(c[0]), cvRound(c[1]));
-        int radius = cvRound(c[2]);
-        // circle center
-        cv::circle( cimg, center, 1, Scalar(0,255,0));
-        // circle outline
-        cv::circle( cimg, center, radius, Scalar(0,0,255), 1);
-    }
+    Point center(cvRound(circle[0]), cvRound(circle[1]));
+    int radius = cvRound(circle[2]);
+    // circle center
+    cv::circle( cimg, center, 1, Scalar(0,255,0));
+    // circle outline
+    cv::circle( cimg, center, radius, Scalar(0,0,255), 1);
 
     resize(cimg, cimg, Size(), 5, 5);
     imshow("Tag", cimg);
-    waitKey(0);
 #endif
 
 #ifdef DEBUG
     if (marker.valid) {
         cout << "Found marker " << (int) marker.id << " at (" << marker.x << ", " << marker.y << ", theta=" << marker.theta << " deg)" << endl;
     }
+    waitKey(0);
 #endif
     return marker;
 }
@@ -253,6 +288,11 @@ vector<Marker> Detector::find_markers(cv::InputArray rawimage, const std::string
 #endif
 
     for (auto c : circles) {
+        // back to original resolution
+        c[0] *=2;
+        c[1] *=2;
+        c[2] *=2;
+
 #ifdef DEBUG
         Point center(cvRound(c[0]), cvRound(c[1]));
         int radius = cvRound(c[2]);
@@ -260,12 +300,10 @@ vector<Marker> Detector::find_markers(cv::InputArray rawimage, const std::string
         circle( cimg, center, 3, Scalar(0,255,0), -1, 8, 0 );
         // circle outline
         circle( cimg, center, radius, Scalar(0,0,255), 3, 8, 0 );
+        imshow("Small detection surface", small);
+        imshow("Detected circles", cimg);
+        waitKey(0);
 #endif
-
-        // back from 320x240 to 640x480
-        c[0] *=2;
-        c[1] *=2;
-        c[2] *=2;
 
         Marker marker = decode_marker(img, c);
 

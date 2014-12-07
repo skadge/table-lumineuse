@@ -16,6 +16,9 @@ struct Marker {
 class Detector {
 
 public:
+
+    Detector();
+
     cv::Size readCalibration(const std::string &filename);
 
     void prepare(cv::InputArray rawimage, cv::OutputArray undistorted_img, cv::OutputArray small_img);
@@ -33,7 +36,7 @@ private:
 
     // nb of sample points taken on a radius. MUST BE < 32 (since the patterns
     // are encoded as a 32bit int)
-    const int RADIUS_RESOLUTION = 25;
+    static const int RADIUS_RESOLUTION = 25;
 
     // defines the ID and patterns of the various markers.
     // ' ' for white, '-' for black, 1 char = 1 mm, higher bits towards center
@@ -46,7 +49,12 @@ private:
 
     // how many samples to take on a circle (ie how many radii) to recognize
     // the tag. Higher values increase the accuracy of orientation
-    const int NB_RADII = 32;
+    static const int NB_RADII = 32;
+
+    const cv::Rect TABLE_ROI;
+
+    // The kernel used for dilatation and erosion
+    const cv::Mat MORPHOLOGICAL_ELEMENT;
 
     cv::Rect circle2rect(cv::Vec3f circle, double scaling = 1.0);
     unsigned char count_bits(int32_t val) {
