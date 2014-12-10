@@ -68,8 +68,13 @@ function init() {
             this.y = evt.stageY+ this.offset.y;
             // indicate that the stage should be updated on the next tick:
             update = true;
-            $.get('http://192.168.0.16:8080?content={"src":{"id":1,"type":"color","value":[' + r + ',' + g + ',' + b +'],"x":' + this.x + ',"y":' + this.y + "}}");
+            $.get('http://localhost:8080?content={"src":{"id":1,"type":"color","value":[' + r + ',' + g + ',' + b +'],"x":' + this.x + ',"y":' + this.y + "}}");
             });
+
+    s.on("dblclick", function(evt) {
+            $.get('http://localhost:8080?state');
+            });
+
 
 /*
     s.on("rollover", function(evt) {
