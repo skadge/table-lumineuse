@@ -12,9 +12,11 @@ function randomColor() {
               (c && lol(m,s,c-1));})(Math,'0123456789ABCDEF',4)
 };
 
-function randomizeColors() {
+function randomizeColors(except=-1) {
     for (i = 0; i < 15; i++) {
-        document.getElementById(i.toString()).style.backgroundColor = randomColor();
+        if (i != except) {
+            document.getElementById(i.toString()).style.backgroundColor = randomColor();
+        }
     }
 }
 
@@ -24,10 +26,10 @@ function setColorAndRandomize() {
 
 function init() {
     $(".tile").click(function() {
-            randomizeColors();
+            randomizeColors(this.id);
             m = getComputedStyle(this).backgroundColor.match(/^rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i);
             if( m) {
-                $.get('http://localhost:8080?content={"src":{"id":1,"type":"color","value":[' + m[1] + ',' + m[2] + ',' + m[3] +'],"x":0,"y":0}}');
+                $.get('http://192.168.0.16:8080?content={"src":{"id":1,"type":"color","value":[' + m[1] + ',' + m[2] + ',' + m[3] +'],"x":0,"y":0}}');
             }
             });
     randomizeColors();
