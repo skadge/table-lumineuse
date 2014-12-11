@@ -38,11 +38,6 @@ if (${raspicam_FOUND})
     add_executable( markers_acquisition tools/markers_acquisition.cpp)
     target_link_libraries( markers_acquisition LPD8806 ${OpenCV_LIBRARIES} ${raspicam_CV_LIBS})
 
-    pkg_check_modules(CHILITAGS chilitags)
-    include_directories(${CHILITAGS_INCLUDE_DIRS})
-
-    add_executable( tags src/chilitags.cpp)
-    target_link_libraries( tags ${CHILITAGS_LDFLAGS} ${OpenCV_LIBRARIES} ${raspicam_CV_LIBS})
 endif()
 
 
