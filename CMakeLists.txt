@@ -25,6 +25,7 @@ file(GLOB http_server src/http_server/*.cpp)
 
 add_executable( table src/main.cpp src/handler.cpp src/table.cpp ${http_server})
 target_link_libraries( table LPD8806 ${Boost_LIBRARIES} ${JSONCPP_LIBRARIES} )
+install (TARGETS table RUNTIME DESTINATION bin)
 
 add_executable( tags src/detector.cpp src/tag_detector.cpp)
 target_link_libraries( tags ${OpenCV_LIBRARIES} )
@@ -40,9 +41,4 @@ if (${raspicam_FOUND})
 
 endif()
 
-
-
-#add_executable( table src/table.cpp)
-#target_link_libraries( table LPD8806 )
-#install (TARGETS table RUNTIME DESTINATION bin)
 
