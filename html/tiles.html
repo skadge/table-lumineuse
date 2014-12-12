@@ -24,6 +24,12 @@ function setColorAndRandomize() {
     randomizeColors();
 }
 
+function onresize() {
+    var w = window.innerWidth;
+    var h = window.innerHeight;
+    document.getElementById("container").style.width = Math.min((h * 5 / 3) - 30, w-20);
+}
+
 function init() {
     $(".tile").click(function() {
             randomizeColors(this.id);
@@ -37,8 +43,9 @@ function init() {
 
 </script>
 </head>
-<body onload="init()">
+<body onload="init()" onresize="onresize()">
 
+<div id="container">
     <div id="0" class="tile"></div>
     <div id="1" class="tile"></div>
     <div id="2" class="tile"></div>
@@ -54,5 +61,5 @@ function init() {
     <div id="12" class="tile"></div>
     <div id="13" class="tile"></div>
     <div id="14" class="tile"></div>
-
+</div>
 </body>
