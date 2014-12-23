@@ -17,6 +17,22 @@ static const int POWERSWITCH_GPIO=27;
 
 bool running = true;
 
+bool last_switch_state = false;
+
+// returns true if the switch has been pressed, eliminating bouncing
+bool switchPressed() {
+    bool res = false;
+
+    auto state = (GPIORead(POWERSWITCH_GPIO) == 1);
+
+    if (state && (last_switch_state != state)) {
+        res = true;
+    }
+
+    last_switch_state = state;
+    return res;
+}
+
 
 int main(int arg, char * argv[]) {
 
@@ -36,13 +52,7 @@ int main(int arg, char * argv[]) {
     src1->color = Color(255,255,255);
     //src1->position(500, 250, 0);
 
-    //auto red = make_shared<LightSource>();
-    //table.add_light(red);
-    //red->color = Color(255,0,0);
-    //red->update(900, 34, 0);
-
     table->step();
-    //table.show();
 
     cout << "Listening for clients..." << endl;
     http::server::server<handler> s("0.0.0.0", "8080");
@@ -69,28 +79,22 @@ int main(int arg, char * argv[]) {
     auto intermediate = start, end = start;
     chrono::milliseconds dt{0};
 
-    
     while (running) {
 
+        s.poll();
+
         // active = active XOR switch_pressed
-        active = (active != (GPIORead(POWERSWITCH_GPIO) == 1));
+        active = (active != switchPressed());
 
         if (active) {
             // if the table was previously inactive, reset the mode to the
             // last one.
-            if (table->mode == CLOSING) table->mode = last_mode;
-
-            s.poll();
+            if (table->mode == CLOSING) {
+                cout << "Waking up!" << endl;
+                table->mode = last_mode;
+            }
 
             table->step(dt);
-
-            intermediate = chrono::high_resolution_clock::now();
-
-            this_thread::sleep_for(main_loop_duration - (intermediate - start));
-            end = chrono::high_resolution_clock::now();
-            dt = chrono::duration_cast<chrono::milliseconds>(end-start);
-
-            start = chrono::high_resolution_clock::now();
         }
         else {
             if (table->mode != CLOSING) {
@@ -99,9 +103,15 @@ int main(int arg, char * argv[]) {
                 table->mode = CLOSING;
                 table->step(dt); // blocks until LEDs fade out
             }
-
-            this_thread::sleep_for(main_loop_duration);
         }
+
+        intermediate = chrono::high_resolution_clock::now();
+        this_thread::sleep_for(main_loop_duration - (intermediate - start));
+
+        end = chrono::high_resolution_clock::now();
+        dt = chrono::duration_cast<chrono::milliseconds>(end-start);
+
+        start = chrono::high_resolution_clock::now();
     }
 
     table->mode = CLOSING;

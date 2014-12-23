@@ -83,6 +83,7 @@ void Table::step(chrono::milliseconds dt){
 
         if (active_color != current_plain_color) {
             if (!fading) {
+                cout << "Fading to " << active_color << endl;
                 elapsed_fade = chrono::milliseconds(0);
                 fading = true;
             }
@@ -120,6 +121,8 @@ void Table::step(chrono::milliseconds dt){
 
     else if (mode == CLOSING) {
         cout << "Closing!" << endl;
+
+        // fade out:
         elapsed_fade = chrono::milliseconds(0);
         while (elapsed_fade < fade_duration) {
             float alpha = (float) elapsed_fade.count() / fade_duration.count();
@@ -135,6 +138,8 @@ void Table::step(chrono::milliseconds dt){
             elapsed_fade += dt;
             this_thread::sleep_for(dt);
         }
+        current_plain_color = Color::black;
+        fading = false;
         cout << "Bye bye!" << endl;
     }
 
