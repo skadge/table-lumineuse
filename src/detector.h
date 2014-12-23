@@ -41,8 +41,8 @@ private:
     // defines the ID and patterns of the various markers.
     // ' ' for white, '-' for black, 1 char = 1 mm, higher bits towards center
     const std::map<unsigned char, int32_t> MARKERS {
-        {1, 0b0000001111111100111111111},
-        {2, 0b0000000000111111111111111},
+        {1, 0b0000000111111000000000000},
+        {2, 0b0000011110000001111000000},
         {3, 0b1111111100000000111111111},
         {4, 0b1111111111111100111111111}
         };
