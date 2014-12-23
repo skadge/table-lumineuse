@@ -21,9 +21,9 @@ add_library(gpio SHARED src/gpio.c)
 file(GLOB http_server src/http_server/*.cpp)
 
 add_executable( table src/main.cpp src/handler.cpp src/table.cpp ${http_server})
-target_link_libraries( table LPD8806 ${Boost_LIBRARIES} ${JSONCPP_LIBRARIES} )
-install (TARGETS table LPD8806 RUNTIME DESTINATION bin
-                               LIBRARY DESTINATION lib)
+target_link_libraries( table gpio LPD8806 ${Boost_LIBRARIES} ${JSONCPP_LIBRARIES} )
+install (TARGETS table gpio LPD8806 RUNTIME DESTINATION bin
+                                    LIBRARY DESTINATION lib)
 
 # tests
 add_executable( test_strip src/ledstrip.cpp src/test_ledstrip.cpp)
