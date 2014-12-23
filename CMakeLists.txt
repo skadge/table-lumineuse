@@ -16,6 +16,7 @@ include_directories(${JSONCPP_INCLUDE_DIRS})
 
 
 add_library(LPD8806 SHARED src/ledstrip.cpp src/lpd8806led.c src/color.cpp)
+add_library(gpio SHARED src/gpio.c)
 
 file(GLOB http_server src/http_server/*.cpp)
 
