@@ -18,7 +18,7 @@ static const int TABLE_HEIGHT = 500; //mm
 static const int MAX_COLOR_DISTANCE = 1000; //mm (distance max to which a light source impact LEDs)
 
 enum source_type { LIGHT = 0, SOUND  };
-enum mode_type { PLAIN = 0, COLOR_MIX, CLOSING  };
+enum mode_type { PLAIN = 0, COLOR_MIX, PULSE, CLOSING  };
 
 class Source {
 
@@ -129,12 +129,15 @@ class Table {
 
     Ledstrip ledstrip;
 
-    std::chrono::milliseconds fade_duration;
-    std::chrono::milliseconds elapsed_fade;
-    bool fading;
-
     Color current_plain_color; // default constructor: black
+    
+    //** Mode-specific members **
+    
+    bool fading;
+    bool pulse_up; // direction: true when black->color, false when color->black
 
+    // ****
+    
 public:
 
     mode_type mode;
@@ -143,7 +146,8 @@ public:
         mode(PLAIN),
         fade_duration(1000),
         elapsed_fade(0),
-        fading(false) {}
+        fading(false),
+        pulse_up(true) {}
 
     void add_light(std::shared_ptr<LightSource> source) {sources.push_back(source);}
 
@@ -154,6 +158,14 @@ public:
     void show();
 
     Json::Value sources_to_JSON() const;
+
+private:
+
+   std::chrono::milliseconds fade_duration;
+   std::chrono::milliseconds elapsed_fade;
+
+   void fade(Color target_color, std::chrono::milliseconds dt);
+   Color getTargetColor();
 };
 
 #endif

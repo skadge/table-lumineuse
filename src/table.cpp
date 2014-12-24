@@ -68,44 +68,66 @@ ostream& operator<< (ostream &out, const LED &led) {
     return out;
 }
 
+void Table::fade(Color target_color, chrono::milliseconds dt) {
+
+
+    if (target_color == current_plain_color) {
+        fading = false;
+        return;
+    }
+
+    float alpha = (float) elapsed_fade.count() / fade_duration.count();
+
+    if (alpha >= 1.f) {
+        fading = false;
+        elapsed_fade = chrono::milliseconds(0);
+        current_plain_color = target_color;
+        return;
+    }
+
+    fading = true;
+    elapsed_fade += dt;
+
+    Color col = current_plain_color.interpolate(target_color, alpha);
+
+    ledstrip.fill(col);
+
+    // store the individual LEDs color to fade out at the end
+    for (auto& led : leds) {
+        led.color = col;
+    }
+
+
+}
+
+Color Table::getTargetColor() {
+    if (sources.empty()) {
+        return Color::white;
+    }
+    else {
+        return sources.back()->color;
+    }
+
+}
+
 void Table::step(chrono::milliseconds dt){
 
     array<Color, NB_LEDS> colors;
 
     if (mode == PLAIN) {
-        Color active_color;
-        if (sources.empty()) {
-            active_color = Color::white;
+        fade(getTargetColor(), dt);
+    }
+
+    else if (mode == PULSE) {
+
+        if (pulse_up) {
+            fade(getTargetColor(), dt);
+            if (!fading) pulse_up = false;
         }
-        else {
-            active_color = sources.back()->color;
+        else if (!pulse_up) {
+            fade(Color::black, dt);
+            if (!fading) pulse_up = true;
         }
-
-        if (active_color != current_plain_color) {
-            if (!fading) {
-                cout << "Fading to " << active_color << endl;
-                elapsed_fade = chrono::milliseconds(0);
-                fading = true;
-            }
-            if (elapsed_fade > fade_duration) {
-                fading = false;
-                current_plain_color = active_color;
-            }
-
-            float alpha = (float) elapsed_fade.count() / fade_duration.count();
-
-            Color col = current_plain_color.interpolate(active_color, alpha);
-
-            ledstrip.fill(col);
-
-            // store the individual LEDs color to fade out at the end
-            for (auto& led : leds) {
-                led.color = col;
-            }
-
-            elapsed_fade += dt;
-        }
-
     }
 
     else if (mode == COLOR_MIX) {
