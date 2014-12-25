@@ -11,6 +11,9 @@
 
 #include "ledstrip.h"
 
+static const int FADE_DURATION = 1000; //ms
+static const int PULSE_DURATION = 5000; //ms
+
 // Table 0,0: top left corner
 static const int TABLE_WIDTH = 1000; //mm
 static const int TABLE_HEIGHT = 500; //mm
@@ -144,7 +147,7 @@ public:
 
     Table(): 
         mode(PLAIN),
-        fade_duration(1000),
+        fade_duration(FADE_DURATION),
         elapsed_fade(0),
         fading(false),
         pulse_up(true) {}

@@ -70,17 +70,18 @@ reply handler::process_command(const Json::Value& msg)
 
 
     // Handle the table's mode
-    auto mode = msg.get("mode", "PLAIN").asCString();
-    switch (str2int(mode)) {
-        case str2int("PLAIN"):
-            table->mode = PLAIN;
-            break;
-        case str2int("COLOR_MIX"):
-            table->mode = COLOR_MIX;
-            break;
-        case str2int("PULSE"):
-            table->mode = PULSE;
-            break;
+    auto mode = msg.get("mode", "PLAIN").asString();
+    if (mode == "PLAIN" && table->mode != PLAIN) {
+        cout << "Switching to PLAIN mode" << endl;
+        table->mode = PLAIN;
+    }
+    else if (mode == "COLOR_MIX" && table->mode != COLOR_MIX) {
+        cout << "Switching to COLOR_MIX mode" << endl;
+        table->mode = COLOR_MIX;
+    }
+    else if (mode == "PULSE" && table->mode != PULSE) {
+        cout << "Switching to PULSE mode" << endl;
+        table->mode = PULSE;
     }
 
     auto src = msg["src"];

@@ -120,11 +120,12 @@ void Table::step(chrono::milliseconds dt){
 
     else if (mode == PULSE) {
 
+        fade_duration = chrono::milliseconds(PULSE_DURATION);
         if (pulse_up) {
             fade(getTargetColor(), dt);
             if (!fading) pulse_up = false;
         }
-        else if (!pulse_up) {
+        else {
             fade(Color::black, dt);
             if (!fading) pulse_up = true;
         }
