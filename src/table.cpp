@@ -115,6 +115,7 @@ void Table::step(chrono::milliseconds dt){
     array<Color, NB_LEDS> colors;
 
     if (mode == PLAIN) {
+        fade_duration = chrono::milliseconds(FADE_DURATION);
         fade(getTargetColor(), dt);
     }
 
@@ -146,6 +147,7 @@ void Table::step(chrono::milliseconds dt){
         cout << "Closing!" << endl;
 
         // fade out:
+        fade_duration = chrono::milliseconds(FADE_DURATION);
         elapsed_fade = chrono::milliseconds(0);
         while (elapsed_fade < fade_duration) {
             float alpha = (float) elapsed_fade.count() / fade_duration.count();
@@ -161,6 +163,7 @@ void Table::step(chrono::milliseconds dt){
             elapsed_fade += dt;
             this_thread::sleep_for(dt);
         }
+        elapsed_fade = chrono::milliseconds(0);
         current_plain_color = Color::black;
         fading = false;
         cout << "Bye bye!" << endl;
