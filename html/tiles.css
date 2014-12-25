@@ -16,6 +16,12 @@ body {
     z-index:1;
 }
 
+
+.bigtile {
+    width: 33%;
+    margin: 0.165%;
+}
+
 .tile:hover {
     z-index:10;
     background-color: black;
@@ -26,4 +32,30 @@ body {
     content: "";
     display: block;
     padding-top: 100%;
+}
+
+.content {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+#pulse {
+    background: radial-gradient(ellipse at center, #000000 0%,#CC7D28 25%,#331D0A 50%,#7F4E19 75%,#000000 100%); /* W3C */
+}
+
+#plainwhite {
+    background-color: white;
+}
+
+#mix-canvas {
+    border-radius: 10px;
+    display:block;
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #CCC;
+
 }

@@ -11,6 +11,12 @@
 using namespace std;
 using namespace http::server; // boost asio HTTP server
 
+// taken from http://stackoverflow.com/questions/16388510/evaluate-a-string-with-a-switch-in-c
+constexpr unsigned int str2int(const char* str, int h = 0)
+{
+        return !str[h] ? 5381 : (str2int(str, h+1)*33) ^ str[h];
+}
+
 void handler::handle_request(const request& request, reply& response)
 {
     // Decode url to path.
@@ -40,7 +46,7 @@ void handler::handle_request(const request& request, reply& response)
             response = reply::stock_reply(reply::bad_request);
             return;
         }
-        response = process_new_pose(root);
+        response = process_command(root);
     }
     else if (request_path.find("state") != std::string::npos)
     {
@@ -57,12 +63,27 @@ void handler::handle_request(const request& request, reply& response)
 
 }
 
-reply handler::process_new_pose(const Json::Value& msg)
+reply handler::process_command(const Json::Value& msg)
 {
     //cout << "Command successfully parsed:\n";
     //cout << msg;
 
-    Json::Value src = msg["src"];
+
+    // Handle the table's mode
+    auto mode = msg.get("mode", "PLAIN").asCString();
+    switch (str2int(mode)) {
+        case str2int("PLAIN"):
+            table->mode = PLAIN;
+            break;
+        case str2int("COLOR_MIX"):
+            table->mode = COLOR_MIX;
+            break;
+        case str2int("PULSE"):
+            table->mode = PULSE;
+            break;
+    }
+
+    auto src = msg["src"];
     int id = src["id"].asInt();
     auto source = table->get_source(id);
     if (source) {

@@ -21,7 +21,7 @@ public:
 
 private:
 
-    http::server::reply process_new_pose(const Json::Value& msg);
+    http::server::reply process_command(const Json::Value& msg);
     http::server::reply process_get_state();
 
     Json::Value root; // will contains the root value after parsing.

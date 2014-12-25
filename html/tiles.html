@@ -7,6 +7,8 @@
 
 <script>
 
+var TABLE_URI = "http://192.168.0.16:8080";
+
 function randomColor() {
     return '#'+(function lol(m,s,c){return s[m.floor(m.random() * s.length)] +
               (c && lol(m,s,c-1));})(Math,'0123456789ABCDEF',4)
@@ -31,11 +33,12 @@ function onresize() {
 }
 
 function init() {
+    onresize();
     $(".tile").click(function() {
             randomizeColors(this.id);
             m = getComputedStyle(this).backgroundColor.match(/^rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i);
             if( m) {
-                $.get('http://192.168.0.16:8080?content={"src":{"id":1,"type":"color","value":[' + m[1] + ',' + m[2] + ',' + m[3] +'],"x":0,"y":0}}');
+                $.get(TABLE_URI + '?content={"mode":"PLAIN","src":{"id":1,"type":"color","value":[' + m[1] + ',' + m[2] + ',' + m[3] +'],"x":0,"y":0}}');
             }
             });
     randomizeColors();
@@ -51,7 +54,9 @@ function init() {
     <div id="2" class="tile"></div>
     <div id="3" class="tile"></div>
     <!--<div id="back" class="tile"><div class="content">←</div></div>-->
-    <img class="tile" src="left_arrow.svg"/>
+    <a href="index.html">
+        <img class="tile" src="left_arrow.svg"/>
+    </a>
     <div id="4" class="tile"></div>
     <div id="5" class="tile"></div>
     <div id="6" class="tile"></div>
