@@ -81,25 +81,32 @@ Color Table::getTargetColor() {
 
 void Table::step(chrono::milliseconds dt){
 
-    array<Color, NB_LEDS> colors;
+    auto target_color = getTargetColor();
 
     if (mode == PLAIN) {
-        ledstrip.fade(getTargetColor(), dt);
+
+        if (target_color != last_target_color) {
+            ledstrip.effect(FADE, target_color, dt);
+        }
     }
 
     else if (mode == PULSE) {
 
-        if (pulse_up) {
-            ledstrip.fade(getTargetColor(), dt, PULSE_DURATION);
-            if (!ledstrip.is_effect_running()) pulse_up = false;
-        }
-        else {
-            ledstrip.fade(Color::black, dt, PULSE_DURATION);
-            if (!ledstrip.is_effect_running()) pulse_up = true;
+        if (!ledstrip.is_effect_running()) {
+
+            if (pulse_up) {
+                ledstrip.effect(FADE, target_color, dt, PULSE_DURATION);
+                pulse_up = false;
+            }
+            else {
+                ledstrip.effect(FADE, Color::black, dt, PULSE_DURATION);
+                pulse_up = true;
+            }
         }
     }
 
     else if (mode == COLOR_MIX) {
+        array<Color, NB_LEDS> colors;
         int i = 0;
         for (auto& led : leds) {
             led.update(sources);
@@ -112,14 +119,17 @@ void Table::step(chrono::milliseconds dt){
 
     else if (mode == CLOSING) {
         cout << "Closing!" << endl;
+        target_color = Color::black;
 
         // block during the fade out.
         auto elapsed_fade = chrono::milliseconds(0);
         auto dt = chrono::milliseconds(16);
 
-        while (elapsed_fade < FADE_DURATION) {
+        ledstrip.effect(FADE, target_color, dt);
 
-            ledstrip.fade(Color::black, dt);
+        while (elapsed_fade < FADE_DURATION && ledstrip.is_effect_running()) {
+
+            ledstrip.step(dt);
 
             elapsed_fade += dt;
             this_thread::sleep_for(dt);
@@ -127,6 +137,10 @@ void Table::step(chrono::milliseconds dt){
         cout << "Bye bye!" << endl;
     }
 
+
+    last_target_color = target_color;
+
+    ledstrip.step(dt);
 }
 
 shared_ptr<LightSource> Table::get_source(int id) {

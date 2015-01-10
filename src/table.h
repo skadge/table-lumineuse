@@ -130,6 +130,7 @@ class Table {
     Ledstrip ledstrip;
 
     //** Mode-specific members **
+    Color last_target_color;
     bool pulse_up; // direction: true when black->color, false when color->black
 
     // ****

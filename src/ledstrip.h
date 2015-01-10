@@ -18,6 +18,8 @@ static const std::chrono::milliseconds PULSE_DURATION{6000}; //ms
 static const char *SPIDEV = "/dev/spidev0.0";
 static const int NB_LEDS = 32 * 3 + 1;
 
+enum effect_type {FADE};
+
 class Ledstrip {
 
     lpd8806_buffer buf;
@@ -28,8 +30,13 @@ class Ledstrip {
 
     bool running_effect;
 
+    Color target_color;
     std::chrono::milliseconds fade_duration;
     std::chrono::milliseconds elapsed_fade;
+
+
+    void _do_fade(std::chrono::milliseconds dt);
+
 
 
 public:
@@ -48,6 +55,10 @@ public:
      */
     boost::optional<Color> color() const;
     
+    /** runs the pending effects, if any. Must be called at every loop
+     */
+    void step(std::chrono::milliseconds dt);
+
     /**
      * Returns true is an effect (like fading) is currently being performed
      */
@@ -57,7 +68,11 @@ public:
      * EFFECTS
      **********************************************/
 
-    /** Fades from the current color (or mix of colors) to the target color.
+    /** Configure and start an effect (available effects are listed below).
+     *
+     *  FADE:
+     *
+     *  Fades from the current color (or mix of colors) to the target color.
      *  Must be called at every loop, passing the elapsed time dt since last call.
      *
      *  Ledstrip::is_effect_running() returns false once the effect has completed.
@@ -67,7 +82,8 @@ public:
      *  fading effect is initiated (ie, you can not change the duration of the
      *  effect *during* the effect).
      */
-    void fade(const Color target_color, 
+    void effect(effect_type effect,
+              const Color target_color, 
               const std::chrono::milliseconds dt, 
               const std::chrono::milliseconds fade_duration = FADE_DURATION);
 

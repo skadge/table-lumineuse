@@ -144,28 +144,44 @@ boost::optional<Color> Ledstrip::color () const {
 
 }
 
-void Ledstrip::fade(Color target_color, 
+void Ledstrip::step(chrono::milliseconds dt) {
+
+    if (running_effect) {
+        _do_fade(dt);
+    }
+
+}
+
+void Ledstrip::effect(effect_type effect,
+                    Color _target_color, 
                     chrono::milliseconds dt,
                     chrono::milliseconds duration) {
+    
+    if (effect == FADE) {
+        // shortcut if we already have the desired color
+        auto current_color = color();
+        if (current_color && _target_color == current_color) {
+            cout << "No fade to perform: we are already " << _target_color << endl;
+            return;
+        }
 
-    if (!running_effect) {
+        target_color = _target_color;
         fade_duration = duration;
+        elapsed_fade = chrono::milliseconds(0);
         running_effect = true;
+        cout << "Starting to fade to " << _target_color << endl;
     }
+}
 
-    auto current_color = color();
 
-    if (current_color && target_color == current_color) {
-        running_effect = false;
-        return;
-    }
+
+void Ledstrip::_do_fade(chrono::milliseconds dt) {
 
     float alpha = (float) elapsed_fade.count() / fade_duration.count();
 
     if (alpha >= 1.f) {
         fill(target_color);
         running_effect = false;
-        elapsed_fade = chrono::milliseconds(0);
         return;
     }
 
