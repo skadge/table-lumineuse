@@ -68,37 +68,6 @@ ostream& operator<< (ostream &out, const LED &led) {
     return out;
 }
 
-void Table::fade(Color target_color, chrono::milliseconds dt) {
-
-
-    if (target_color == current_plain_color) {
-        fading = false;
-        return;
-    }
-
-    float alpha = (float) elapsed_fade.count() / fade_duration.count();
-
-    if (alpha >= 1.f) {
-        fading = false;
-        elapsed_fade = chrono::milliseconds(0);
-        current_plain_color = target_color;
-        return;
-    }
-
-    fading = true;
-    elapsed_fade += dt;
-
-    Color col = current_plain_color.interpolate(target_color, alpha);
-
-    ledstrip.fill(col);
-
-    // store the individual LEDs color to fade out at the end
-    for (auto& led : leds) {
-        led.color = col;
-    }
-
-
-}
 
 Color Table::getTargetColor() {
     if (sources.empty()) {
@@ -115,20 +84,18 @@ void Table::step(chrono::milliseconds dt){
     array<Color, NB_LEDS> colors;
 
     if (mode == PLAIN) {
-        fade_duration = chrono::milliseconds(FADE_DURATION);
-        fade(getTargetColor(), dt);
+        ledstrip.fade(getTargetColor(), dt);
     }
 
     else if (mode == PULSE) {
 
-        fade_duration = chrono::milliseconds(PULSE_DURATION);
         if (pulse_up) {
-            fade(getTargetColor(), dt);
-            if (!fading) pulse_up = false;
+            ledstrip.fade(getTargetColor(), dt, PULSE_DURATION);
+            if (!ledstrip.is_effect_running()) pulse_up = false;
         }
         else {
-            fade(Color::black, dt);
-            if (!fading) pulse_up = true;
+            ledstrip.fade(Color::black, dt);
+            if (!ledstrip.is_effect_running()) pulse_up = true;
         }
     }
 
@@ -146,26 +113,17 @@ void Table::step(chrono::milliseconds dt){
     else if (mode == CLOSING) {
         cout << "Closing!" << endl;
 
-        // fade out:
-        fade_duration = chrono::milliseconds(FADE_DURATION);
-        elapsed_fade = chrono::milliseconds(0);
-        while (elapsed_fade < fade_duration) {
-            float alpha = (float) elapsed_fade.count() / fade_duration.count();
-            int i = 0;
-            for (auto& led : leds) {
-                colors[i] = led.color.interpolate(Color::black, alpha);
-                i++;
-            }
+        // block during the fade out.
+        auto elapsed_fade = chrono::milliseconds(0);
+        auto dt = chrono::milliseconds(16);
 
-            ledstrip.set(colors);
+        while (elapsed_fade < FADE_DURATION) {
 
-            dt = chrono::milliseconds(16);
+            ledstrip.fade(Color::black, dt);
+
             elapsed_fade += dt;
             this_thread::sleep_for(dt);
         }
-        elapsed_fade = chrono::milliseconds(0);
-        current_plain_color = Color::black;
-        fading = false;
         cout << "Bye bye!" << endl;
     }
 

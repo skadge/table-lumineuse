@@ -11,9 +11,6 @@
 
 #include "ledstrip.h"
 
-static const int FADE_DURATION = 1000; //ms
-static const int PULSE_DURATION = 5000; //ms
-
 // Table 0,0: top left corner
 static const int TABLE_WIDTH = 1000; //mm
 static const int TABLE_HEIGHT = 500; //mm
@@ -132,11 +129,7 @@ class Table {
 
     Ledstrip ledstrip;
 
-    Color current_plain_color; // default constructor: black
-    
     //** Mode-specific members **
-    
-    bool fading;
     bool pulse_up; // direction: true when black->color, false when color->black
 
     // ****
@@ -147,9 +140,6 @@ public:
 
     Table(): 
         mode(PLAIN),
-        fade_duration(FADE_DURATION),
-        elapsed_fade(0),
-        fading(false),
         pulse_up(true) {}
 
     void add_light(std::shared_ptr<LightSource> source) {sources.push_back(source);}
@@ -164,10 +154,6 @@ public:
 
 private:
 
-   std::chrono::milliseconds fade_duration;
-   std::chrono::milliseconds elapsed_fade;
-
-   void fade(Color target_color, std::chrono::milliseconds dt);
    Color getTargetColor();
 };
 
