@@ -14,7 +14,7 @@ const Color Color::blue(0,0,255);
 const Color Color::green(0,255,0);
 
 
-bool Color::operator==(const Color& target) {
+bool Color::operator==(const Color& target) const {
 
     uint8_t r,g,b;
 

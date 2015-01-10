@@ -16,8 +16,8 @@ public:
     std::tuple<uint8_t, uint8_t, uint8_t> rgb() const {return std::make_tuple(_r, _g, _b);}
     //std::tuple<float, float, float> hsl() const {return std::make_tuple(_r, _g, _b);}
 
-    bool operator==(const Color& target);
-    bool operator!=(const Color& target) { return !(operator==(target));}
+    bool operator==(const Color& target) const;
+    bool operator!=(const Color& target) const { return !(operator==(target));}
 
     friend std::ostream& operator<< (std::ostream &out, const Color &color);
 
