@@ -17,10 +17,15 @@ static const int POWERSWITCH_GPIO=27;
 
 bool running = true;
 
+bool on_raspi = true;
+
 bool last_switch_state = false;
 
 // returns true if the switch has been pressed, eliminating bouncing
 bool switchPressed() {
+
+    if (!on_raspi) return false;
+
     bool res = false;
 
     auto state = (GPIORead(POWERSWITCH_GPIO) == 1);
@@ -42,8 +47,11 @@ int main(int arg, char * argv[]) {
     /*
      * Enable and configure  GPIO pin 27 (ie, GPIO 2 on the board)
      */
-    if (-1 == GPIOExport(POWERSWITCH_GPIO)) return(1);
-    if (-1 == GPIODirection(POWERSWITCH_GPIO, IN)) return(2);
+    if (-1 == GPIOExport(POWERSWITCH_GPIO)
+        || -1 == GPIODirection(POWERSWITCH_GPIO, IN)) {
+        cout << "Cannot setup the GPIOs. Probably not running on the Raspi. I won't use the switch." << endl;
+        on_raspi = false;
+    }
 
     auto table = make_shared<Table>();
     auto src1 = make_shared<LightSource>(1);
