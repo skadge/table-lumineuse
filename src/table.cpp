@@ -94,7 +94,7 @@ void Table::step(chrono::milliseconds dt){
             if (!ledstrip.is_effect_running()) pulse_up = false;
         }
         else {
-            ledstrip.fade(Color::black, dt);
+            ledstrip.fade(Color::black, dt, PULSE_DURATION);
             if (!ledstrip.is_effect_running()) pulse_up = true;
         }
     }
