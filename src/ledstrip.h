@@ -12,8 +12,8 @@
 #include "color.h"
 #include "lpd8806led.h"
 
-static const std::chrono::milliseconds FADE_DURATION{1000}; //ms
-static const std::chrono::milliseconds PULSE_DURATION{5000}; //ms
+static const std::chrono::milliseconds FADE_DURATION{2000}; //ms
+static const std::chrono::milliseconds PULSE_DURATION{6000}; //ms
 
 static const char *SPIDEV = "/dev/spidev0.0";
 static const int NB_LEDS = 32 * 3 + 1;
