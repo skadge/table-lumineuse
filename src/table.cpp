@@ -1,8 +1,9 @@
 #include <thread>
+#include <iostream>
 
 #include "table.h"
+#include "effects.h"
 
-#include <iostream>
 
 using namespace std;
 
@@ -86,7 +87,7 @@ void Table::step(chrono::milliseconds dt){
     if (mode == PLAIN) {
 
         if (target_color != last_target_color) {
-            ledstrip.effect(FADE, target_color, dt);
+            ledstrip.effect(make_shared<Fade>(target_color));
         }
     }
 
@@ -95,11 +96,11 @@ void Table::step(chrono::milliseconds dt){
         if (!ledstrip.is_effect_running()) {
 
             if (pulse_up) {
-                ledstrip.effect(FADE, target_color, dt, PULSE_DURATION);
+                ledstrip.effect(make_shared<Fade>(target_color, PULSE_DURATION));
                 pulse_up = false;
             }
             else {
-                ledstrip.effect(FADE, Color::black, dt, PULSE_DURATION);
+                ledstrip.effect(make_shared<Fade>(Color::black, PULSE_DURATION));
                 pulse_up = true;
             }
         }
@@ -125,7 +126,7 @@ void Table::step(chrono::milliseconds dt){
         auto elapsed_fade = chrono::milliseconds(0);
         auto dt = chrono::milliseconds(16);
 
-        ledstrip.effect(FADE, target_color, dt);
+        ledstrip.effect(make_shared<Fade>(target_color));
 
         while (elapsed_fade < FADE_DURATION && ledstrip.is_effect_running()) {
 

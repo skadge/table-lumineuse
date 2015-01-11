@@ -14,9 +14,7 @@
 using namespace std;
 
 Ledstrip::Ledstrip() : 
-    initialized(false),
-    running_effect(false),
-    elapsed_fade(0) {
+    initialized(false) {
 
     int return_value;
 
@@ -64,7 +62,7 @@ Ledstrip::~Ledstrip() {
 
 void Ledstrip::blank() {
 
-    colors.fill(Color()); // all LEDs are black
+    _colors.fill(Color()); // all LEDs are black
 
     if (!initialized) return;
 
@@ -80,7 +78,7 @@ void Ledstrip::blank() {
 
 void Ledstrip::fill(uint8_t r, uint8_t g, uint8_t b) {
 
-    colors.fill(Color(r, g, b));
+    _colors.fill(Color(r, g, b));
 
     if (!initialized) return;
 
@@ -100,7 +98,7 @@ void Ledstrip::fill(Color color) {
 
 void Ledstrip::set(int idx, uint8_t r, uint8_t g, uint8_t b) {
 
-    colors[idx] = Color(r, g, b);
+    _colors[idx] = Color(r, g, b);
 
     if (!initialized) return;
 
@@ -117,14 +115,14 @@ void Ledstrip::set(int idx, Color color) {
 
 void Ledstrip::set(const std::array<Color, NB_LEDS>& colorarray) {
 
-    colors = colorarray;
+    _colors = colorarray;
 
     if (!initialized) return;
 
     uint8_t r, g, b;
 
     for(int i=0;i<NB_LEDS;i++) {
-        tie(r, g, b) = colors[i].rgb();
+        tie(r, g, b) = _colors[i].rgb();
         write_gamma_color(&buf.pixels[i],r,g,b);
     }
     send_buffer(fd,&buf);
@@ -136,9 +134,9 @@ boost::optional<Color> Ledstrip::color () const {
     // TODO: implement shortcuts: after a 'Ledstrip::fill' for instance, we know
     // all the colors are the same.
 
-    auto col = colors[0];
+    auto col = _colors[0];
     for (int i = 1; i < NB_LEDS; i++) {
-        if (colors[i] != col) return boost::none;
+        if (_colors[i] != col) return boost::none;
     }
     return col;
 
@@ -146,54 +144,29 @@ boost::optional<Color> Ledstrip::color () const {
 
 void Ledstrip::step(chrono::milliseconds dt) {
 
-    if (running_effect) {
-        _do_fade(dt);
+    for (auto effect : _effects) effect->step(*this, dt);
+
+    // Clear effects that are over.
+    _effects.erase(
+            remove_if(_effects.begin(), _effects.end(),
+                      [](const shared_ptr<Effect> e) { return e->done(); }),
+            _effects.end());
+}
+
+bool Ledstrip::is_effect_running() const {
+
+    for (auto effect : _effects) {
+        if (effect->running()) return true;
     }
+    return false;
 
 }
 
-void Ledstrip::effect(effect_type effect,
-                    Color _target_color, 
-                    chrono::milliseconds dt,
-                    chrono::milliseconds duration) {
-    
-    if (effect == FADE) {
-        // shortcut if we already have the desired color
-        auto current_color = color();
-        if (current_color && _target_color == current_color) {
-            cout << "No fade to perform: we are already " << _target_color << endl;
-            return;
-        }
+void Ledstrip::effect(shared_ptr<Effect> effect) {
 
-        target_color = _target_color;
-        fade_duration = duration;
-        elapsed_fade = chrono::milliseconds(0);
-        running_effect = true;
-        cout << "Starting to fade to " << _target_color << endl;
-    }
-}
-
-
-
-void Ledstrip::_do_fade(chrono::milliseconds dt) {
-
-    float alpha = (float) elapsed_fade.count() / fade_duration.count();
-
-    if (alpha >= 1.f) {
-        fill(target_color);
-        running_effect = false;
-        return;
-    }
-
-    elapsed_fade += dt;
-
-    array<Color, NB_LEDS> next_colors;
-    for (int i = 0; i < NB_LEDS; i++) {
-        next_colors[i] = colors[i].interpolate(target_color, alpha);
-    }
-
-    set(next_colors);
+    _effects.push_back(effect);
 
 }
+
 
 

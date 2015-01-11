@@ -15,7 +15,7 @@ pkg_check_modules(JSONCPP jsoncpp)
 include_directories(${JSONCPP_INCLUDE_DIRS})
 
 
-add_library(LPD8806 SHARED src/ledstrip.cpp src/lpd8806led.c src/color.cpp)
+add_library(LPD8806 SHARED src/ledstrip.cpp src/lpd8806led.c src/color.cpp src/effects.cpp)
 
 add_library(gpio SHARED src/gpio.c)
 

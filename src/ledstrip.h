@@ -6,19 +6,16 @@
 #include <vector>
 #include <iostream>
 #include <chrono>
+#include <memory>
 
 #include <boost/optional.hpp>
 
+#include "effects.h"
 #include "color.h"
 #include "lpd8806led.h"
 
-static const std::chrono::milliseconds FADE_DURATION{2000}; //ms
-static const std::chrono::milliseconds PULSE_DURATION{6000}; //ms
-
 static const char *SPIDEV = "/dev/spidev0.0";
 static const int NB_LEDS = 32 * 3 + 1;
-
-enum effect_type {FADE};
 
 class Ledstrip {
 
@@ -26,18 +23,9 @@ class Ledstrip {
     int fd;
     bool initialized;
 
-    std::array<Color, NB_LEDS> colors;
+    std::array<Color, NB_LEDS> _colors;
 
-    bool running_effect;
-
-    Color target_color;
-    std::chrono::milliseconds fade_duration;
-    std::chrono::milliseconds elapsed_fade;
-
-
-    void _do_fade(std::chrono::milliseconds dt);
-
-
+    std::vector<std::shared_ptr<Effect>> _effects;
 
 public:
     Ledstrip();
@@ -54,7 +42,9 @@ public:
      * nothing if the strip currently has several mixed colors
      */
     boost::optional<Color> color() const;
-    
+
+    std::array<Color, NB_LEDS> colors() const {return _colors;}
+
     /** runs the pending effects, if any. Must be called at every loop
      */
     void step(std::chrono::milliseconds dt);
@@ -62,30 +52,16 @@ public:
     /**
      * Returns true is an effect (like fading) is currently being performed
      */
-    bool is_effect_running() const {return running_effect;}
+    bool is_effect_running() const;
 
     /***********************************************
      * EFFECTS
      **********************************************/
 
-    /** Configure and start an effect (available effects are listed below).
-     *
-     *  FADE:
-     *
-     *  Fades from the current color (or mix of colors) to the target color.
-     *  Must be called at every loop, passing the elapsed time dt since last call.
-     *
-     *  Ledstrip::is_effect_running() returns false once the effect has completed.
-     *
-     *  The total duration of the fade effect can be defined via fade_duration
-     *  and defaults to FADE_DURATION. Note that this value is only used when the
-     *  fading effect is initiated (ie, you can not change the duration of the
-     *  effect *during* the effect).
+    /** Adds an effect. The effect is actually 'played' when calling
+     * Ledstrip::step(dt)
      */
-    void effect(effect_type effect,
-              const Color target_color, 
-              const std::chrono::milliseconds dt, 
-              const std::chrono::milliseconds fade_duration = FADE_DURATION);
+    void effect(std::shared_ptr<Effect> effect);
 
 };
 
