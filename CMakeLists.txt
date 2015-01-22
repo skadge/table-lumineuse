@@ -37,6 +37,9 @@ target_link_libraries( test_strip LPD8806 )
 add_executable( static_tags src/tag_detector.cpp)
 target_link_libraries( static_tags tagdetector )
 
+add_executable( perlin tools/perlin.cpp)
+target_link_libraries( perlin ${OpenCV_LIBRARIES} )
+
 
 
 find_package(raspicam)
