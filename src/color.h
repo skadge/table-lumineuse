@@ -2,6 +2,7 @@
 #define COLOR_H
 
 #include <tuple>
+#include <map>
 #include <vector>
 #include <iostream>
 
@@ -48,4 +49,17 @@ public:
     static const Color green;
 
 };
+
+class Gradient {
+
+    const static int MAX_COLORS = 10000;
+
+    std::vector<Color> _gradient;
+
+public:
+    Gradient(const std::map<float, Color>& gradient);
+
+    Color operator [](float alpha) const;
+};
+
 #endif

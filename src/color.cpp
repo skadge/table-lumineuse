@@ -5,6 +5,8 @@
 
 #include "color.h"
 
+#include <cassert>
+
 using namespace std;
 
 const Color Color::white(255,255,255);
@@ -119,4 +121,40 @@ void HSVtoRGB(double h, double s, double v, double *r, double *g, double *b) {
       break;
   }
 }
+
+
+Gradient::Gradient(const std::map<float, Color>& gradient) : _gradient(MAX_COLORS){
+    // generate all possible interpolated colors
+    for (auto i = 0; i < MAX_COLORS ; i++) {
+            
+        float alpha0 = 0.f;
+        float alpha = ((float)i) / MAX_COLORS;
+
+        for (auto& kv : gradient) {
+            if (kv.first >= alpha) {
+
+                auto col1 = gradient.at(alpha0);
+                auto col2 = gradient.at(kv.first);
+                auto ratio = (alpha - alpha0) / (kv.first - alpha0);
+                
+                auto new_col = col1.interpolate(col2, ratio);
+                _gradient[i] = new_col;
+            }
+            else alpha0 = kv.first;
+        }
+
+    }
+
+};
+
+Color Gradient::operator [](float alpha) const {
+
+    assert(alpha <= 1.f);
+
+    int i = round(alpha * MAX_COLORS);
+    if (i == MAX_COLORS) i = MAX_COLORS - 1;
+
+    return _gradient[i];
+}
+
 
