@@ -7,8 +7,11 @@ SET(CMAKE_CXX_FLAGS "-std=c++11")
 find_package( Boost 1.54 COMPONENTS system thread REQUIRED )
 include_directories( ${Boost_INCLUDE_DIR} )
 
-find_package(OpenCV REQUIRED)
-include_directories(${OpenCV_INCLUDE_DIRS})
+find_package(OpenCV)
+if (${OpenCV_FOUND})
+    add_definitions(-DHAS_OPENCV)
+    include_directories(${OpenCV_INCLUDE_DIRS})
+endif()
 
 find_package(PkgConfig)
 pkg_check_modules(JSONCPP jsoncpp)
@@ -16,6 +19,7 @@ include_directories(${JSONCPP_INCLUDE_DIRS})
 
 
 add_library(LPD8806 SHARED src/ledstrip.cpp src/lpd8806led.c src/color.cpp src/effects.cpp)
+target_link_libraries( LPD8806 ${OpenCV_LIBRARIES} )
 
 add_library(gpio SHARED src/gpio.c)
 

@@ -5,6 +5,12 @@
 #include <vector>
 #include <iostream>
 
+#ifdef HAS_OPENCV
+#include <opencv2/core/core.hpp>
+#endif
+
+typedef std::tuple<uint8_t, uint8_t, uint8_t> RGB;
+
 class Color {
 
     uint8_t _r, _g, _b;
@@ -13,7 +19,13 @@ public:
     Color(): _r(0), _g(0), _b(0) {}
     Color(uint8_t r, uint8_t g, uint8_t b) : _r(r), _g(g), _b(b) {}
 
-    std::tuple<uint8_t, uint8_t, uint8_t> rgb() const {return std::make_tuple(_r, _g, _b);}
+    RGB rgb() const {return std::make_tuple(_r, _g, _b);}
+
+#ifdef HAS_OPENCV
+    // returns a Vec3f, as expected for OpenCV images of type 32FC3, BGR format
+    cv::Vec3f vec3f() const {return cv::Vec3f(_b/255.f, _g/255.f, _r/255.f);}
+#endif
+
     //std::tuple<float, float, float> hsl() const {return std::make_tuple(_r, _g, _b);}
 
     bool operator==(const Color& target) const;
