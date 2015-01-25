@@ -4,7 +4,6 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-#include "gradients.h"
 #include "effects.h"
 #include "ledstrip.h" // for NB_LEDS
 
@@ -103,19 +102,19 @@ void Noise::step(Ledstrip& leds,
     int j = 0, i =0;
     for (; i < WIDTH; i++) {
         auto val = (float) perlin->noise(i/scale, j/scale, z);
-        leds.set(i, FOREST_GRADIENT[(val + 1)/2.f]);
+        leds.set(i, colormap[(val + 1)/2.f]);
     }
     for (; j < HEIGHT; j++) {
         auto val = (float) perlin->noise(i/scale, j/scale, z);
-        leds.set(WIDTH + j, FOREST_GRADIENT[(val + 1)/2.f]);
+        leds.set(WIDTH + j, colormap[(val + 1)/2.f]);
     }
     for (; i >= 0; i--) {
         auto val = (float) perlin->noise(i/scale, j/scale, z);
-        leds.set(WIDTH + HEIGHT + (WIDTH - i), FOREST_GRADIENT[(val + 1)/2.f]);
+        leds.set(WIDTH + HEIGHT + (WIDTH - i), colormap[(val + 1)/2.f]);
     }
     for (; j >= 0; j--) {
         auto val = (float) perlin->noise(i/scale, j/scale, z);
-        leds.set(2 * WIDTH + HEIGHT + (HEIGHT - j), FOREST_GRADIENT[(val + 1)/2.f]);
+        leds.set(2 * WIDTH + HEIGHT + (HEIGHT - j), colormap[(val + 1)/2.f]);
     }
 
 }
