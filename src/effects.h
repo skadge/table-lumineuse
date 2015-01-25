@@ -2,6 +2,7 @@
 #define EFFECTS_H
 
 #include <chrono>
+#include <memory>
 
 #include "color.h"
 
@@ -9,6 +10,7 @@ static const std::chrono::milliseconds FADE_DURATION{2000}; //ms
 static const std::chrono::milliseconds PULSE_DURATION{6000}; //ms
 
 class Ledstrip;
+class Perlin;
 
 class Effect {
 
@@ -59,5 +61,26 @@ public:
 
 
 };
+
+class Noise : public Effect {
+
+    double z;
+    float scale;
+    float speed;
+    const Gradient colormap;
+
+    std::shared_ptr<Perlin> perlin; // pointer only to permit forward-declaration of Perlin class
+
+public:
+    Noise(const Gradient colormap, 
+          float speed = .5f);
+
+
+    void step(Ledstrip& leds,
+              const std::chrono::milliseconds dt);
+
+
+};
+
 
 #endif

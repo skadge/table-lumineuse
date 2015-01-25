@@ -4,6 +4,10 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+#include "gradients.h"
+#include "effects.h"
+#include "ledstrip.h" // for NB_LEDS
+
 using namespace cv;
 using namespace std;
 
@@ -78,36 +82,41 @@ public:
 
 /********************************************************************************/
 
-int main() {
-
-    const double scale = 40.;
-    const double speed = 0.05;
-
-
-    const int WIDTH = 640, HEIGHT = 480;
-
-    auto perlin = Perlin();
+Noise::Noise(const Gradient colormap, 
+          float speed) :
+            z(0.),
+            scale(10.f),
+            speed(speed),
+            colormap(colormap),
+            perlin(make_shared<Perlin>()) {};
 
 
-    Mat noise = Mat::zeros(HEIGHT, WIDTH, CV_32FC1);
+void Noise::step(Ledstrip& leds,
+        const std::chrono::milliseconds dt) {
 
-    namedWindow("noise", WINDOW_NORMAL);
+    const int WIDTH = NB_LEDS / 3, HEIGHT = NB_LEDS / 6;
 
-    double z = 0.;
-    while(true) {
-        z += speed;
 
-        for (int i = 0 ; i < WIDTH; i++) {
-            for (int j = 0 ; j < HEIGHT; j++) {
-                auto val = perlin.noise(i/scale, j/scale, z);
-                noise.at<float>(j,i) = (float) (val + 1)/2. ;
-            }
-        }
 
-        imshow("noise", noise);
-        waitKey(10);
+    z += speed * dt.count() * 0.001; // so that dt = 20ms => z += 0.01 with default speed
+
+    int j = 0, i =0;
+    for (; i < WIDTH; i++) {
+        auto val = (float) perlin->noise(i/scale, j/scale, z);
+        leds.set(i, FOREST_GRADIENT[(val + 1)/2.f]);
+    }
+    for (; j < HEIGHT; j++) {
+        auto val = (float) perlin->noise(i/scale, j/scale, z);
+        leds.set(WIDTH + j, FOREST_GRADIENT[(val + 1)/2.f]);
+    }
+    for (; i >= 0; i--) {
+        auto val = (float) perlin->noise(i/scale, j/scale, z);
+        leds.set(WIDTH + HEIGHT + (WIDTH - i), FOREST_GRADIENT[(val + 1)/2.f]);
+    }
+    for (; j >= 0; j--) {
+        auto val = (float) perlin->noise(i/scale, j/scale, z);
+        leds.set(2 * WIDTH + HEIGHT + (HEIGHT - j), FOREST_GRADIENT[(val + 1)/2.f]);
     }
 
-    return 0;
 }
 

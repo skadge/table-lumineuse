@@ -18,7 +18,7 @@ pkg_check_modules(JSONCPP jsoncpp)
 include_directories(${JSONCPP_INCLUDE_DIRS})
 
 
-add_library(LPD8806 SHARED src/ledstrip.cpp src/lpd8806led.c src/color.cpp src/effects.cpp)
+add_library(LPD8806 SHARED src/ledstrip.cpp src/lpd8806led.c src/color.cpp src/effects.cpp src/perlin.cpp)
 target_link_libraries( LPD8806 ${OpenCV_LIBRARIES} )
 
 add_library(gpio SHARED src/gpio.c)
@@ -40,11 +40,6 @@ target_link_libraries( test_strip LPD8806 )
 
 add_executable( static_tags src/tag_detector.cpp)
 target_link_libraries( static_tags tagdetector )
-
-add_executable( perlin tools/perlin.cpp)
-target_link_libraries( perlin ${OpenCV_LIBRARIES} )
-
-
 
 find_package(raspicam)
 if (${raspicam_FOUND})
