@@ -53,6 +53,8 @@ Ledstrip::Ledstrip() :
 
 Ledstrip::~Ledstrip() {
 
+    if (!initialized) return;
+
     blank();
     lpd8806_free(&buf);
     close(fd);
