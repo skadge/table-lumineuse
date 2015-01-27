@@ -25,7 +25,7 @@ class Ledstrip {
 
     std::array<Color, NB_LEDS> _colors;
 
-    std::vector<std::shared_ptr<Effect>> _effects;
+    std::shared_ptr<Effect> _effect;
 
 public:
     Ledstrip();
@@ -52,16 +52,21 @@ public:
     /**
      * Returns true is an effect (like fading) is currently being performed
      */
-    bool is_effect_running() const;
+    bool is_effect_running() const {return _effect && _effect->running();}
+
+    /**
+     * Requests effect to stop
+     */
+    void stop_effect() {if (_effect) _effect->stop();}
 
     /***********************************************
      * EFFECTS
      **********************************************/
 
-    /** Adds an effect. The effect is actually 'played' when calling
-     * Ledstrip::step(dt)
+    /** Set (or replace) the current effect. The effect is actually 'played'
+     * when calling Ledstrip::step(dt)
      */
-    void effect(std::shared_ptr<Effect> effect);
+    void set_effect(std::shared_ptr<Effect> effect);
 
 };
 

@@ -146,29 +146,14 @@ boost::optional<Color> Ledstrip::color () const {
 
 void Ledstrip::step(chrono::milliseconds dt) {
 
-    for (auto effect : _effects) effect->step(*this, dt);
+    if (!_effect) return;
 
-    // Clear effects that are over.
-    _effects.erase(
-            remove_if(_effects.begin(), _effects.end(),
-                      [](const shared_ptr<Effect> e) { return e->done(); }),
-            _effects.end());
+    _effect->step(*this, dt);
+
+    if (_effect->done()) _effect = nullptr;
 }
 
-bool Ledstrip::is_effect_running() const {
-
-    for (auto effect : _effects) {
-        if (effect->running()) return true;
-    }
-    return false;
-
+void Ledstrip::set_effect(std::shared_ptr<Effect> effect) {
+    if (_effect) _effect->stop();
+    _effect = effect;
 }
-
-void Ledstrip::effect(shared_ptr<Effect> effect) {
-
-    _effects.push_back(effect);
-
-}
-
-
-

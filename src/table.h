@@ -10,6 +10,7 @@
 #include <json/json.h>
 
 #include "ledstrip.h"
+#include "effects.h"
 
 // Table 0,0: top left corner
 static const int TABLE_WIDTH = 1000; //mm
@@ -18,7 +19,7 @@ static const int TABLE_HEIGHT = 500; //mm
 static const int MAX_COLOR_DISTANCE = 1000; //mm (distance max to which a light source impact LEDs)
 
 enum source_type { LIGHT = 0, SOUND  };
-enum mode_type { PLAIN = 0, COLOR_MIX, PULSE, CLOSING  };
+enum mode_type { PLAIN = 0, COLOR_MIX, PULSE, NOISE, CLOSING  };
 
 class Source {
 
@@ -96,8 +97,12 @@ protected:
     float x, y;
 
 public:
+    inline float distance(float tx, float ty) {
+        return sqrt(pow(tx - x, 2) + pow(ty - y, 2));
+    }
+
     float distance(const Source& source) {
-        return sqrt(pow(source.x() - x, 2) + pow(source.y() - y, 2));
+        return distance(source.x(), source.y());
     }
 
 };
@@ -137,11 +142,15 @@ class Table {
     
 public:
 
+    // set this to false to enter 'soft sleep' mode, to true to wake up
+    bool active;
+
     mode_type mode;
 
     Table(): 
         mode(PLAIN),
-        pulse_up(true) {}
+        pulse_up(true),
+        active(true) {}
 
     void add_light(std::shared_ptr<LightSource> source) {sources.push_back(source);}
 
@@ -149,9 +158,12 @@ public:
 
     std::shared_ptr<LightSource> get_source(int id);
 
-    void show();
-
     Json::Value sources_to_JSON() const;
+
+    void set_effect(std::shared_ptr<Effect> effect);
+
+    // for debugging: prints the list of LEDs values
+    void show();
 
 private:
 

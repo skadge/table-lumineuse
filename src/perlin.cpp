@@ -87,11 +87,21 @@ Noise::Noise(const Gradient colormap,
             scale(10.f),
             speed(speed),
             colormap(colormap),
-            perlin(make_shared<Perlin>()) {};
+            perlin(make_shared<Perlin>()) {
+
+    cout << "Starting noise effect." << endl;
+    _running = true;
+};
 
 
 void Noise::step(Ledstrip& leds,
         const std::chrono::milliseconds dt) {
+
+    if (!_running) {
+        _done = true;
+        cout << "Noise effect now stopped." << endl;
+        return;
+    }
 
     const int WIDTH = NB_LEDS / 3, HEIGHT = NB_LEDS / 6;
 
@@ -119,3 +129,6 @@ void Noise::step(Ledstrip& leds,
 
 }
 
+void Noise::stop() {
+    _running = false;
+}

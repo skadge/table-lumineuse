@@ -2,8 +2,7 @@
 #include <iostream>
 
 #include "table.h"
-#include "effects.h"
-
+#include "gradients.h"
 
 using namespace std;
 
@@ -84,23 +83,16 @@ void Table::step(chrono::milliseconds dt){
 
     auto target_color = getTargetColor();
 
-    if (mode == PLAIN) {
-
-        if (target_color != last_target_color) {
-            ledstrip.effect(make_shared<Fade>(target_color));
-        }
-    }
-
-    else if (mode == PULSE) {
+    if (mode == PULSE) {
 
         if (!ledstrip.is_effect_running()) {
 
             if (pulse_up) {
-                ledstrip.effect(make_shared<Fade>(target_color, PULSE_DURATION));
+                ledstrip.set_effect(make_shared<Fade>(target_color, PULSE_DURATION));
                 pulse_up = false;
             }
             else {
-                ledstrip.effect(make_shared<Fade>(Color::black, PULSE_DURATION));
+                ledstrip.set_effect(make_shared<Fade>(Color::black, PULSE_DURATION));
                 pulse_up = true;
             }
         }
@@ -119,6 +111,7 @@ void Table::step(chrono::milliseconds dt){
     }
 
     else if (mode == CLOSING) {
+
         cout << "Closing!" << endl;
         target_color = Color::black;
 
@@ -126,7 +119,7 @@ void Table::step(chrono::milliseconds dt){
         auto elapsed_fade = chrono::milliseconds(0);
         auto dt = chrono::milliseconds(16);
 
-        ledstrip.effect(make_shared<Fade>(target_color));
+        ledstrip.set_effect(make_shared<Fade>(target_color));
 
         while (elapsed_fade < FADE_DURATION && ledstrip.is_effect_running()) {
 
@@ -149,6 +142,11 @@ shared_ptr<LightSource> Table::get_source(int id) {
         if (source->id() == id) return source;
     }
     return nullptr;
+}
+
+void Table::set_effect(shared_ptr<Effect> effect) {
+
+    ledstrip.set_effect(effect);
 }
 
 void Table::show(){

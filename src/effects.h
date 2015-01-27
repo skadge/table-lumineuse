@@ -10,7 +10,6 @@ static const std::chrono::milliseconds FADE_DURATION{2000}; //ms
 static const std::chrono::milliseconds PULSE_DURATION{6000}; //ms
 
 class Ledstrip;
-class Perlin;
 
 class Effect {
 
@@ -28,9 +27,13 @@ public:
     virtual void step(Ledstrip& leds,
                       const std::chrono::milliseconds dt) = 0;
 
+    // request the effect to stop
+    void stop() {};
+
     bool running() const {return _running;}
     bool done() const {return _done;}
 };
+
 
 class Fade : public Effect {
 
@@ -62,6 +65,8 @@ public:
 
 };
 
+class Perlin; // defined in perlin.cpp
+
 class Noise : public Effect {
 
     double z;
@@ -80,6 +85,7 @@ public:
               const std::chrono::milliseconds dt);
 
 
+    void stop();
 };
 
 

@@ -21,6 +21,7 @@ void Fade::step(Ledstrip& leds, const chrono::milliseconds dt) {
             _done = true;
             return;
         }
+        cout << "Starting to fade." << endl;
         _running = true;
     }
     ////////////////////////////////////////////////////////
@@ -31,6 +32,7 @@ void Fade::step(Ledstrip& leds, const chrono::milliseconds dt) {
         leds.fill(target_color);
         _running = false;
         _done = true;
+        cout << "Fading complete." << endl;
         return;
     }
 

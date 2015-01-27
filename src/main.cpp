@@ -41,9 +41,6 @@ bool switchPressed() {
 
 int main(int arg, char * argv[]) {
 
-    // 'active' toggles when the power switch is pressed (ie, 'soft' poweroff)
-    bool active = true;
-
     /*
      * Enable and configure  GPIO pin 27 (ie, GPIO 2 on the board)
      */
@@ -77,6 +74,7 @@ int main(int arg, char * argv[]) {
     signals.async_wait(
       [](boost::system::error_code /*ec*/, int /*signo*/)
       {
+        cout << "Received a quit signal..." << endl;
         running = false;
       });
 
@@ -87,18 +85,20 @@ int main(int arg, char * argv[]) {
     auto intermediate = start, end = start;
     chrono::milliseconds dt{0};
 
+    cout << "Entering main loop." << endl;
     while (running) {
 
         s.poll();
 
+        // 'active' toggles when the power switch is pressed (ie, 'soft' poweroff)
         // active = active XOR switch_pressed
-        active = (active != switchPressed());
+        table->active = (table->active != switchPressed());
 
-        if (active) {
-            // if the table was previously inactive, reset the mode to the
-            // last one.
+        if (table->active) {
+            // if the table was previously inactive and no new mode has been
+            // set, reset the mode to the last one.
             if (table->mode == CLOSING) {
-                cout << "Waking up!" << endl;
+                cout << "Waking up! Continuing what I was doing..." << endl;
                 table->mode = last_mode;
             }
 
@@ -122,7 +122,11 @@ int main(int arg, char * argv[]) {
         start = chrono::high_resolution_clock::now();
     }
 
+
+    cout << "Fading off the table... (this may take a few seconds...)" << endl;
+
     table->mode = CLOSING;
     table->step(dt); // the last stepping blocks until LEDs fade out
 
+    cout << "Quitting now." << endl;
 }
