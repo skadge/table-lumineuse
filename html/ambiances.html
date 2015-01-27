@@ -1,0 +1,50 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Table Lumineuse</title>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<link rel ="stylesheet" type="text/css" href="tiles.css" title="Style">
+
+<script>
+
+var TABLE_URI = "http://192.168.0.16:8080";
+//var TABLE_URI = "http://localhost:8080";
+
+function onresize() {
+    var w = window.innerWidth;
+    var h = window.innerHeight;
+    document.getElementById("container").style.width = Math.min((h * 3 / 2) - 30, w-20);
+}
+
+function init() {
+    onresize();
+    $("#ocean").click(function() {
+        $.get(TABLE_URI + '?content={"mode":"NOISE","src":{"type":"ocean"}}');
+    });
+    $("#nature").click(function() {
+        $.get(TABLE_URI + '?content={"mode":"NOISE","src":{"type":"nature"}}');
+    });
+    $("#fire").click(function() {
+        $.get(TABLE_URI + '?content={"mode":"NOISE","src":{"type":"fire"}}');
+    });
+}
+
+</script>
+</head>
+<body onload="init()" onresize="onresize()">
+
+<div id="container">
+    <div id="ocean" class="tile bigtile">
+        <img class="content" style="width:100%" src="ocean.svg"/>
+    </div>
+    <div id="nature" class="tile bigtile">
+        <img class="content" style="width:100%" src="nature.svg"/>
+    </div>
+    <div id="fire" class="tile bigtile">
+        <img class="content" style="width:100%" src="fire.svg"/>
+    </div>
+    <div class="tile bigtile"></div>
+    <div class="tile bigtile"></div>
+    <div class="tile bigtile"></div>
+</div>
+</body>

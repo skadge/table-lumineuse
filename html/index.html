@@ -8,6 +8,7 @@
 <script>
 
 var TABLE_URI = "http://192.168.0.16:8080";
+//var TABLE_URI = "http://localhost:8080";
 
 function onresize() {
     var w = window.innerWidth;
@@ -22,6 +23,9 @@ function init() {
     });
     $("#plainwhite").click(function() {
         $.get(TABLE_URI + '?content={"mode":"PLAIN","src":{"id":1,"type":"color","value":[255,255,255],"x":0,"y":0}}');
+    });
+    $("#black").click(function() {
+        $.get(TABLE_URI + '?content={"mode":"STOP"}');
     });
 }
 
@@ -42,7 +46,11 @@ function init() {
             <img class="content" style="width:100%" src="mix.svg"/>
         </a>
     </div>
-    <div class="tile bigtile"></div>
-    <div class="tile bigtile"></div>
+    <div class="tile bigtile">
+        <a href="ambiances.html">
+            <img class="content" style="width:100%" src="shapes.svg"/>
+        </a>
+    </div>
+    <div id="black" class="tile bigtile"></div>
 </div>
 </body>
