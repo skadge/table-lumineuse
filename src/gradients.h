@@ -1,3 +1,6 @@
+#include <map>
+#include <string>
+
 #include "color.h"
 
 
@@ -23,3 +26,8 @@ const static Gradient OCEAN_GRADIENT({
         {1.f, {44, 83, 158}}
     });
 
+const static std::map<std::string, Gradient> GRADIENTS({
+        {"nature", FOREST_GRADIENT},
+        {"fire", FIRE_GRADIENT},
+        {"ocean", OCEAN_GRADIENT}
+    });
