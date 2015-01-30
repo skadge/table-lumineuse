@@ -110,30 +110,6 @@ void Table::step(chrono::milliseconds dt){
         ledstrip.set(colors);
     }
 
-    else if (mode == CLOSING) {
-
-        cout << "Closing!" << endl;
-        target_color = Color::black;
-
-        // block during the fade out.
-        auto elapsed_fade = chrono::milliseconds(0);
-        auto dt = chrono::milliseconds(16);
-
-        ledstrip.set_effect(make_shared<Fade>(target_color));
-
-        while (elapsed_fade < FADE_DURATION && ledstrip.is_effect_running()) {
-
-            ledstrip.step(dt);
-
-            elapsed_fade += dt;
-            this_thread::sleep_for(dt);
-        }
-        cout << "Bye bye!" << endl;
-    }
-
-
-    last_target_color = target_color;
-
     ledstrip.step(dt);
 }
 

@@ -8,6 +8,7 @@
 #include <memory>
 #include <chrono>
 #include <json/json.h>
+#include <boost/optional.hpp>
 
 #include "ledstrip.h"
 #include "effects.h"
@@ -135,7 +136,6 @@ class Table {
     Ledstrip ledstrip;
 
     //** Mode-specific members **
-    Color last_target_color;
     bool pulse_up; // direction: true when black->color, false when color->black
 
     // ****
@@ -161,6 +161,7 @@ public:
     Json::Value sources_to_JSON() const;
 
     void set_effect(std::shared_ptr<Effect> effect);
+    boost::optional<Color> color() const {return ledstrip.color();}
 
     // for debugging: prints the list of LEDs values
     void show();

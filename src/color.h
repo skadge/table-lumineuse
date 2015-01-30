@@ -52,7 +52,7 @@ public:
 
 class Gradient {
 
-    const static int MAX_COLORS = 10000;
+    const static int MAX_COLORS = 200;
 
     std::vector<Color> _gradient;
 

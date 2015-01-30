@@ -79,13 +79,14 @@ int main(int arg, char * argv[]) {
       });
 
 
-    auto last_mode = PLAIN;
+    auto last_color = table->color();
 
     auto start = chrono::high_resolution_clock::now();
     auto intermediate = start, end = start;
     chrono::milliseconds dt{0};
 
     cout << "Entering main loop." << endl;
+    table->set_effect(make_shared<Fade>(Color::white));
     while (running) {
 
         s.poll();
@@ -95,23 +96,23 @@ int main(int arg, char * argv[]) {
         table->active = (table->active != switchPressed());
 
         if (table->active) {
-            // if the table was previously inactive and no new mode has been
-            // set, reset the mode to the last one.
             if (table->mode == CLOSING) {
-                cout << "Waking up! Continuing what I was doing..." << endl;
-                table->mode = last_mode;
+                cout << "Waking up!" << endl;
+                if (last_color)
+                    table->set_effect(make_shared<Fade>(*last_color));
+                else
+                    table->set_effect(make_shared<Fade>(Color::white));
             }
 
-            table->step(dt);
         }
         else {
             if (table->mode != CLOSING) {
                 cout << "Going to 'soft' sleep" << endl;
-                last_mode = table->mode;
-                table->mode = CLOSING;
-                table->step(dt); // blocks until LEDs fade out
+                last_color = table->color();
+                table->set_effect(make_shared<Fade>(Color::black));
             }
         }
+        table->step(dt);
 
         intermediate = chrono::high_resolution_clock::now();
         this_thread::sleep_for(main_loop_duration - (intermediate - start));
