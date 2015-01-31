@@ -98,6 +98,7 @@ int main(int arg, char * argv[]) {
         if (table->active) {
             if (table->mode == CLOSING) {
                 cout << "Waking up!" << endl;
+                table->mode = PLAIN;
                 if (last_color)
                     table->set_effect(make_shared<Fade>(*last_color));
                 else
@@ -108,6 +109,7 @@ int main(int arg, char * argv[]) {
         else {
             if (table->mode != CLOSING) {
                 cout << "Going to 'soft' sleep" << endl;
+                table->mode = CLOSING;
                 last_color = table->color();
                 table->set_effect(make_shared<Fade>(Color::black));
             }
