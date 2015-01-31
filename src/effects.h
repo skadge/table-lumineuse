@@ -52,7 +52,7 @@ public:
     ColorSet step(const std::chrono::milliseconds dt) {return plain_colors;}
 };
 
-static Plain PLAIN_BLACK(Color::black);
-static Plain PLAIN_WHITE(Color::white);
+static std::shared_ptr<Plain> PLAIN_BLACK(std::make_shared<Plain>(Color::black));
+static std::shared_ptr<Plain> PLAIN_WHITE(std::make_shared<Plain>(Color::white));
 
 #endif

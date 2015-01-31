@@ -24,7 +24,7 @@ void Table::step(chrono::milliseconds dt){
     // the table has just been switched to 'inactive'
     if (previously_active && !active) {
         cout << "Switching off..." << endl;
-        set_next_effect(&PLAIN_BLACK);
+        set_next_effect(PLAIN_BLACK);
         previously_active = false;
     }
 
@@ -36,7 +36,7 @@ void Table::step(chrono::milliseconds dt){
         // restore the previous effect. Otherwise,
         // a new effect has been set, and we have nothing 
         // to do.
-        if (current_effect.get() == &PLAIN_BLACK) {
+        if (current_effect == PLAIN_BLACK) {
             set_next_effect(previous_effect);
         }
 
