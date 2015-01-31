@@ -125,11 +125,5 @@ int main(int arg, char * argv[]) {
         start = chrono::high_resolution_clock::now();
     }
 
-
-    cout << "Fading off the table... (this may take a few seconds...)" << endl;
-
-    table->mode = CLOSING;
-    table->step(dt); // the last stepping blocks until LEDs fade out
-
     cout << "Quitting now." << endl;
 }
