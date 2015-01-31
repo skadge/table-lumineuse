@@ -5,88 +5,53 @@
 #include <memory>
 
 #include "color.h"
+#include "ledstrip.h" // for ColorSet
 
-static const std::chrono::milliseconds FADE_DURATION{2000}; //ms
 static const std::chrono::milliseconds PULSE_DURATION{6000}; //ms
 
-class Ledstrip;
-
-class Effect {
+class Transition {
 
 protected:
-    bool _running;
     bool _done;
 
 public:
-    Effect() : _running(false), _done(false) {}
+    Transition() : _done(false) {}
+
+    // virtual destructor -> polymorphic class
+    virtual ~Transition() {}
+
+    virtual ColorSet step(const ColorSet& start_colors,
+                      const ColorSet& end_colors,
+                      const std::chrono::milliseconds dt) = 0;
+
+    bool done() const {return _done;}
+};
+
+class Effect {
+
+public:
+    Effect() {}
 
     // virtual destructor -> polymorphic class
     virtual ~Effect() {}
 
 
-    virtual void step(Ledstrip& leds,
-                      const std::chrono::milliseconds dt) = 0;
-
-    // request the effect to stop
-    void stop() {};
-
-    bool running() const {return _running;}
-    bool done() const {return _done;}
+    virtual ColorSet step(const std::chrono::milliseconds dt) = 0;
 };
 
+/* Most basic effect: always return the same plain color
+ */
+class Plain : public Effect {
 
-class Fade : public Effect {
-
-    Color target_color;
-    std::chrono::milliseconds fade_duration;
-    std::chrono::milliseconds elapsed_fade;
-
+protected:
+    ColorSet plain_colors;
 
 public:
-    /*
-     *  FADE:
-     *
-     *  Fades from the current color (or mix of colors) to the target color.
-     *  Fade::step(leds, dt) be called at every loop, passing the elapsed time
-     *  dt since last call.
-     *
-     *  Use Fade::done() to know when the effect has completed.
-     *
-     *  The total duration of the fade effect can be defined via fade_duration
-     *  and defaults to FADE_DURATION.
-     */
-    Fade(const Color target_color, 
-         const std::chrono::milliseconds fade_duration = FADE_DURATION);
+    Plain(const Color& color) {for (auto& col : plain_colors) col = color;}
 
-
-    void step(Ledstrip& leds,
-              const std::chrono::milliseconds dt);
-
-
+    ColorSet step(const std::chrono::milliseconds dt) {return plain_colors;}
 };
 
-class Perlin; // defined in perlin.cpp
-
-class Noise : public Effect {
-
-    double z;
-    float scale;
-    float speed;
-    const Gradient colormap;
-
-    std::shared_ptr<Perlin> perlin; // pointer only to permit forward-declaration of Perlin class
-
-public:
-    Noise(const Gradient colormap, 
-          float speed = .5f);
-
-
-    void step(Ledstrip& leds,
-              const std::chrono::milliseconds dt);
-
-
-    void stop();
-};
 
 
 #endif

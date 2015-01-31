@@ -115,7 +115,7 @@ void Ledstrip::set(int idx, Color color) {
     set(idx, r, g, b);
 }
 
-void Ledstrip::set(const std::array<Color, NB_LEDS>& colorarray) {
+void Ledstrip::set(const ColorSet& colorarray) {
 
     _colors = colorarray;
 
@@ -144,16 +144,3 @@ boost::optional<Color> Ledstrip::color () const {
 
 }
 
-void Ledstrip::step(chrono::milliseconds dt) {
-
-    if (!_effect) return;
-
-    _effect->step(*this, dt);
-
-    if (_effect->done()) _effect = nullptr;
-}
-
-void Ledstrip::set_effect(std::shared_ptr<Effect> effect) {
-    if (_effect) _effect->stop();
-    _effect = effect;
-}

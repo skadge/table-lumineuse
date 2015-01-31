@@ -10,12 +10,13 @@
 
 #include <boost/optional.hpp>
 
-#include "effects.h"
 #include "color.h"
 #include "lpd8806led.h"
 
 static const char *SPIDEV = "/dev/spidev0.0";
 static const int NB_LEDS = 32 * 3 + 1;
+
+typedef std::array<Color, NB_LEDS> ColorSet;
 
 class Ledstrip {
 
@@ -23,9 +24,7 @@ class Ledstrip {
     int fd;
     bool initialized;
 
-    std::array<Color, NB_LEDS> _colors;
-
-    std::shared_ptr<Effect> _effect;
+    ColorSet _colors;
 
 public:
     Ledstrip();
@@ -35,7 +34,7 @@ public:
     void fill(Color color);
     void set(int idx, uint8_t r, uint8_t g, uint8_t b);
     void set(int idx, Color color);
-    void set(const std::array<Color, NB_LEDS>& colors);
+    void set(const ColorSet& colors);
 
     /**
      * Returns optionally the current color of the strip, or
@@ -43,31 +42,7 @@ public:
      */
     boost::optional<Color> color() const;
 
-    std::array<Color, NB_LEDS> colors() const {return _colors;}
-
-    /** runs the pending effects, if any. Must be called at every loop
-     */
-    void step(std::chrono::milliseconds dt);
-
-    /**
-     * Returns true is an effect (like fading) is currently being performed
-     */
-    bool is_effect_running() const {return _effect && _effect->running();}
-
-    /**
-     * Requests effect to stop
-     */
-    void stop_effect() {if (_effect) _effect->stop();}
-
-    /***********************************************
-     * EFFECTS
-     **********************************************/
-
-    /** Set (or replace) the current effect. The effect is actually 'played'
-     * when calling Ledstrip::step(dt)
-     */
-    void set_effect(std::shared_ptr<Effect> effect);
-
+    ColorSet colors() const {return _colors;}
 };
 
 

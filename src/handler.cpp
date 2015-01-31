@@ -9,7 +9,8 @@
 
 #include "table.h"
 
-#include "effects.h"
+#include "fade.h"
+#include "noise.h"
 #include "gradients.h"
 
 using namespace std;
@@ -82,23 +83,21 @@ reply handler::process_command(const Json::Value& msg)
         auto color = Color(msg["src"]["value"][0u].asInt(),
                            msg["src"]["value"][1u].asInt(),
                            msg["src"]["value"][2u].asInt());
-        table->mode = PLAIN;
-        table->set_effect(make_shared<Fade>(color));
+        table->set_next_effect(make_shared<Plain>(color));
         cout << "PLAIN mode, color: " << color << endl;
         return reply::stock_reply(reply::accepted);
     }
     else if (mode == "COLOR_MIX") {
         cout << "Switching to COLOR_MIX mode" << endl;
-        table->mode = COLOR_MIX;
+        cout << "NOT IMPLEMENTED!" << endl;
     }
     else if (mode == "PULSE") {
         cout << "Switching to PULSE mode" << endl;
-        table->mode = PULSE;
+        cout << "NOT IMPLEMENTED!" << endl;
     }
     else if (mode == "NOISE") {
         auto type = msg["src"]["type"].asString();
-        table->mode = NOISE;
-        table->set_effect(make_shared<Noise>(GRADIENTS.at(type)));
+        table->set_next_effect(make_shared<Noise>(GRADIENTS.at(type)));
         cout << "NOISE mode, type: " << type << endl;
         return reply::stock_reply(reply::accepted);
     }

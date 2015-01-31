@@ -1,13 +1,8 @@
 #include <cmath>
 #include <iostream>
 
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
+#include "noise.h"
 
-#include "effects.h"
-#include "ledstrip.h" // for NB_LEDS
-
-using namespace cv;
 using namespace std;
 
 /********************************************************************************
@@ -90,45 +85,36 @@ Noise::Noise(const Gradient colormap,
             perlin(make_shared<Perlin>()) {
 
     cout << "Starting noise effect." << endl;
-    _running = true;
 };
 
 
-void Noise::step(Ledstrip& leds,
-        const std::chrono::milliseconds dt) {
-
-    if (!_running) {
-        _done = true;
-        cout << "Noise effect now stopped." << endl;
-        return;
-    }
+ColorSet Noise::step(const std::chrono::milliseconds dt) {
 
     const int WIDTH = NB_LEDS / 3, HEIGHT = NB_LEDS / 6;
 
-
-
     z += speed * dt.count() * 0.001; // so that dt = 20ms => z += 0.01 with default speed
+
+    ColorSet next_colors;
 
     int j = 0, i =0;
     for (; i < WIDTH; i++) {
         auto val = (float) perlin->noise(i/scale, j/scale, z);
-        leds.set(i, colormap[(val + 1)/2.f]);
+        next_colors[i] = colormap[(val + 1)/2.f];
     }
     for (; j < HEIGHT; j++) {
         auto val = (float) perlin->noise(i/scale, j/scale, z);
-        leds.set(WIDTH + j, colormap[(val + 1)/2.f]);
+        next_colors[WIDTH + j] = colormap[(val + 1)/2.f];
     }
     for (; i >= 0; i--) {
         auto val = (float) perlin->noise(i/scale, j/scale, z);
-        leds.set(WIDTH + HEIGHT + (WIDTH - i), colormap[(val + 1)/2.f]);
+        next_colors[WIDTH + HEIGHT + (WIDTH - i)] = colormap[(val + 1)/2.f];
     }
     for (; j >= 0; j--) {
         auto val = (float) perlin->noise(i/scale, j/scale, z);
-        leds.set(2 * WIDTH + HEIGHT + (HEIGHT - j), colormap[(val + 1)/2.f]);
+        next_colors[2 * WIDTH + HEIGHT + (HEIGHT - j)] = colormap[(val + 1)/2.f];
     }
 
+    return next_colors;
+
 }
 
-void Noise::stop() {
-    _running = false;
-}

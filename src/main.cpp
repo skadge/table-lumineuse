@@ -51,13 +51,6 @@ int main(int arg, char * argv[]) {
     }
 
     auto table = make_shared<Table>();
-    auto src1 = make_shared<LightSource>(1);
-
-    table->add_light(src1);
-    src1->color = Color(255,255,255);
-    //src1->position(500, 250, 0);
-
-    table->step();
 
     cout << "Listening for clients..." << endl;
     http::server::server<handler> s("0.0.0.0", "8080");
@@ -79,14 +72,12 @@ int main(int arg, char * argv[]) {
       });
 
 
-    auto last_color = table->color();
-
     auto start = chrono::high_resolution_clock::now();
     auto intermediate = start, end = start;
     chrono::milliseconds dt{0};
 
     cout << "Entering main loop." << endl;
-    table->set_effect(make_shared<Fade>(Color::white));
+
     while (running) {
 
         s.poll();
@@ -95,25 +86,6 @@ int main(int arg, char * argv[]) {
         // active = active XOR switch_pressed
         table->active = (table->active != switchPressed());
 
-        if (table->active) {
-            if (table->mode == CLOSING) {
-                cout << "Waking up!" << endl;
-                table->mode = PLAIN;
-                if (last_color)
-                    table->set_effect(make_shared<Fade>(*last_color));
-                else
-                    table->set_effect(make_shared<Fade>(Color::white));
-            }
-
-        }
-        else {
-            if (table->mode != CLOSING) {
-                cout << "Going to 'soft' sleep" << endl;
-                table->mode = CLOSING;
-                last_color = table->color();
-                table->set_effect(make_shared<Fade>(Color::black));
-            }
-        }
         table->step(dt);
 
         intermediate = chrono::high_resolution_clock::now();
