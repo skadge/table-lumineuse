@@ -102,7 +102,7 @@ reply handler::process_command(const Json::Value& msg)
         return reply::stock_reply(reply::accepted);
     }
     else if (mode == "STOP") {
-        cout << "Switching off" << endl;
+        cout << "STOP mode" << endl;
         table->active = false;
         return reply::stock_reply(reply::accepted);
     }

@@ -23,14 +23,25 @@ void Table::step(chrono::milliseconds dt){
 
     // the table has just been switched to 'inactive'
     if (previously_active && !active) {
-        set_next_effect(make_shared<Plain>(Color::black));
-    }
-    
-    // the table is waking up
-    if (!previously_active && active) {
-        set_next_effect(previous_effect);
+        cout << "Switching off..." << endl;
+        set_next_effect(&PLAIN_BLACK);
+        previously_active = false;
     }
 
+    // the table is waking up: restore previous effect
+    if (!previously_active && active) {
+        cout << "Waking up..." << endl;
+
+        // if the current effect is plain black, we
+        // restore the previous effect. Otherwise,
+        // a new effect has been set, and we have nothing 
+        // to do.
+        if (current_effect.get() == &PLAIN_BLACK) {
+            set_next_effect(previous_effect);
+        }
+
+        previously_active = true;
+    }
 
     auto colors = current_effect->step(dt);
 
