@@ -21,7 +21,7 @@ class Noise : public Effect {
 
 public:
     Noise(const Gradient colormap, 
-          float speed = .5f);
+          float speed = .2f);
 
     ColorSet step(const std::chrono::milliseconds dt);
 
