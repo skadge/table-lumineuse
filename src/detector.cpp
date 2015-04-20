@@ -51,7 +51,7 @@ void Detector::prepare(InputArray rawimage, OutputArray undistorted_img, OutputA
 void Detector::detect_circles(InputArray img, OutputArray circles) {
 
     HoughCircles(img, circles,
-                 HOUGH_GRADIENT,
+                 CV_HOUGH_GRADIENT,
                  1, // dp
                  20, // min dist
                  30, // param 1
@@ -239,7 +239,7 @@ Marker Detector::decode_marker(InputArray img, Vec3f approx_circle) {
 
     vector<Vec3f> circles;
     HoughCircles(tag, circles,
-                 HOUGH_GRADIENT,
+                 CV_HOUGH_GRADIENT,
                  2.2, // dp
                  20, // min dist
                  20, // param 1
