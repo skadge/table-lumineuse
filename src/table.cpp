@@ -43,10 +43,14 @@ void Table::step(chrono::milliseconds dt){
         previously_active = true;
     }
 
+    // compute the color based on the current effect
     auto colors = current_effect->step(dt);
 
     if (!transition->done()) {
+        // transition from a previous effect still running?
+        // Then: 1- compute the colors based on the previous effect
         auto previous_colors = previous_effect->step(dt);
+        // 2- blend them and display them
         ledstrip.set(transition->step(previous_colors, colors, dt));
     }
     else ledstrip.set(colors);

@@ -18,6 +18,7 @@ pkg_check_modules(JSONCPP jsoncpp)
 include_directories(${JSONCPP_INCLUDE_DIRS})
 
 
+# LIGHT EFFECTS
 add_library(ledeffects SHARED src/ledstrip.cpp 
                               src/lpd8806led.c 
                               src/color.cpp 
@@ -26,6 +27,18 @@ add_library(ledeffects SHARED src/ledstrip.cpp
                               src/noise.cpp)
 
 target_link_libraries( ledeffects ${OpenCV_LIBRARIES} )
+
+
+# SOUND EFFECTS
+pkg_check_modules(SFML sfml-all)
+include_directories(${SFML_INCLUDE_DIRS})
+
+add_library(soundeffects SHARED src/soundeffect.cpp 
+                                src/sfml_sound.cpp)
+
+target_link_libraries( soundeffects ${SFML_LIBRARIES} )
+
+
 
 add_library(gpio SHARED src/gpio.c)
 
@@ -39,9 +52,10 @@ add_executable( table src/main.cpp
                       src/table.cpp
                       src/sources.cpp
                       ${http_server})
-target_link_libraries( table gpio ledeffects ${Boost_LIBRARIES} ${JSONCPP_LIBRARIES} )
-install (TARGETS table gpio tagdetector ledeffects RUNTIME DESTINATION bin
-                                    LIBRARY DESTINATION lib)
+target_link_libraries( table gpio ledeffects soundeffects ${Boost_LIBRARIES} ${JSONCPP_LIBRARIES} )
+install (TARGETS table gpio tagdetector ledeffects soundeffects 
+         RUNTIME DESTINATION bin
+         LIBRARY DESTINATION lib)
 
 # tests
 add_executable( test_strip src/ledstrip.cpp src/test_ledstrip.cpp)

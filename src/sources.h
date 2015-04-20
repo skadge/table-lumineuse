@@ -73,18 +73,7 @@ public:
 
 };
 
-class SoundSource : public Source {
-
-protected:
-    std::string sound_name;
-    float volume;
-
-public:
-    SoundSource(int id) : Source(id) {
-        type = SOUND;
-    }
-
-};
+// SoundSource is declared in sound.h and defined in sound.cpp
 
 class Actuator {
 

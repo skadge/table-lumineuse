@@ -8,6 +8,8 @@
 #include "table.h"
 #include "gpio.h"
 
+#include "sfml_sound.h"
+
 using namespace std;
 
 static const double MAIN_LOOP_FPS=60;
@@ -78,7 +80,12 @@ int main(int arg, char * argv[]) {
 
     cout << "Entering main loop." << endl;
 
+    auto water = SFMLSound("/home/skadge/src/table-lumineuse/share/sounds/water.ogg");
+
+    water.play();
+
     while (running) {
+        cout << "Sound playing: " << water.playing() << endl;
 
         s.poll();
 
