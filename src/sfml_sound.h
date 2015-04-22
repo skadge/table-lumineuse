@@ -14,14 +14,16 @@ private:
 
     bool _sound_loaded;
 
+    void load_sound();
+
 public:
-    SFMLSound(const std::string& name);
+    SFMLSound(const std::string& path, bool loop=false);
 
     ~SFMLSound() {
         stop();
     }
 
-    bool playing();
+    bool playing() const;
 
     void volume(float vol);
 

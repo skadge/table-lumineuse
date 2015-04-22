@@ -7,14 +7,16 @@
 class SoundSource : public Source {
 
 protected:
-    std::string sound_name;
+    std::string path;
     float _playing;
+    float loop;
 
 public:
-    SoundSource(const std::string& name) : 
+    SoundSource(const std::string& path, bool loop=false) : 
             Source(0), 
-            sound_name(name),
-            _playing(false) {
+            path(path),
+            _playing(false),
+            loop(loop) {
         type = SOUND;
     }
 

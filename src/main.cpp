@@ -3,11 +3,15 @@
 #include <chrono>
 #include <thread>
 
+#include <boost/filesystem/path.hpp>
+#include <boost/filesystem/operations.hpp>
+
 #include "http_server/server.hpp"
 #include "handler.h"
 #include "table.h"
 #include "gpio.h"
 
+#include "soundlibrary.h"
 #include "sfml_sound.h"
 
 using namespace std;
@@ -42,6 +46,11 @@ bool switchPressed() {
 
 
 int main(int arg, char * argv[]) {
+
+    string prefix = boost::filesystem::initial_path().branch_path().string();
+    cout << "Current PREFIX: " << prefix << endl;
+
+    SoundLibrary sounds = SoundLibrary(prefix);
 
     /*
      * Enable and configure  GPIO pin 27 (ie, GPIO 2 on the board)
@@ -80,12 +89,9 @@ int main(int arg, char * argv[]) {
 
     cout << "Entering main loop." << endl;
 
-    auto water = SFMLSound("/home/skadge/src/table-lumineuse/share/sounds/water.ogg");
-
-    water.play();
+    sounds.background["water"]->play();
 
     while (running) {
-        cout << "Sound playing: " << water.playing() << endl;
 
         s.poll();
 

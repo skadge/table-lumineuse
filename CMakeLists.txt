@@ -4,7 +4,7 @@ project(table)
 
 SET(CMAKE_CXX_FLAGS "-std=c++11")
 
-find_package( Boost 1.54 COMPONENTS system thread REQUIRED )
+find_package( Boost 1.54 COMPONENTS system thread filesystem REQUIRED )
 include_directories( ${Boost_INCLUDE_DIR} )
 
 find_package(OpenCV)
@@ -34,6 +34,7 @@ pkg_check_modules(SFML sfml-all)
 include_directories(${SFML_INCLUDE_DIRS})
 
 add_library(soundeffects SHARED src/soundeffect.cpp 
+                                src/soundlibrary.cpp 
                                 src/sfml_sound.cpp)
 
 target_link_libraries( soundeffects ${SFML_LIBRARIES} )

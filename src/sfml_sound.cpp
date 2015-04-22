@@ -4,21 +4,29 @@
 
 using namespace std;
 
-SFMLSound::SFMLSound(const string& name) :
-    SoundSource(name),
-    _sound_loaded(false) {
+SFMLSound::SFMLSound(const string& path, bool loop) :
+    SoundSource(path,loop),
+    _sound_loaded(false) {}
 
-        if (!buffer.loadFromFile(name)) {
-            cerr << "Unable to load sound " << name << endl;
+void SFMLSound::load_sound() {
+
+    if (!_sound_loaded) {
+
+        if (!buffer.loadFromFile(path)) {
+            cerr << "Unable to load sound " << path << endl;
             return;
         }
 
         sound.setBuffer(buffer);
+
+        sound.setLoop(loop);
+
         _sound_loaded = true;
     }
+}
 
 
-bool SFMLSound::playing() {
+bool SFMLSound::playing() const {
     return sound.getStatus() == sound.Playing;
 }
 
@@ -27,7 +35,13 @@ void SFMLSound::volume(float vol) {
 }
 
 void SFMLSound::play() {
-    if (!_sound_loaded) return;
+    if (!_sound_loaded) {
+        // try to load the sound...
+        load_sound();
+        if (!_sound_loaded) {
+            return;
+        }
+    }
 
     sound.play();
 
