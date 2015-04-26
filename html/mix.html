@@ -9,7 +9,10 @@
 
 <script>
 
-var TABLE_URI = "http://192.168.0.16:8080";
+var TABLE_URI="http://localhost:8080"
+if (window.location.hostname != "")
+    TABLE_URI = window.location.protocol + "//" + window.location.hostname + ":8080";
+
 
 var canvas, stage;
 
