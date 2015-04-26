@@ -48,6 +48,6 @@ public:
 
 };
 
-static Silence SILENCE;
+static std::shared_ptr<Silence> SILENCE(std::make_shared<Silence>());
 
 #endif
