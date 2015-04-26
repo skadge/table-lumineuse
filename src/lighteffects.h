@@ -1,5 +1,5 @@
-#ifndef EFFECTS_H
-#define EFFECTS_H
+#ifndef LIGHTEFFECTS_H
+#define LIGHTEFFECTS_H
 
 #include <chrono>
 #include <memory>

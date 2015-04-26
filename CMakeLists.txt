@@ -22,7 +22,6 @@ include_directories(${JSONCPP_INCLUDE_DIRS})
 add_library(ledeffects SHARED src/ledstrip.cpp 
                               src/lpd8806led.c 
                               src/color.cpp 
-                              src/effects.cpp 
                               src/fade.cpp 
                               src/noise.cpp)
 

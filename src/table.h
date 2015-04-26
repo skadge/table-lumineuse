@@ -10,7 +10,7 @@
 #include <boost/optional.hpp>
 
 #include "ledstrip.h"
-#include "effects.h"
+#include "lighteffects.h"
 
 #include "soundlibrary.h"
 

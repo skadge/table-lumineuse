@@ -4,7 +4,6 @@
 #include "table.h"
 #include "gradients.h"
 #include "fade.h"
-#include "effects.h"
 
 using namespace std;
 

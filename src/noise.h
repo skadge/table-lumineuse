@@ -4,7 +4,7 @@
 #include <chrono>
 #include <memory>
 
-#include "effects.h"
+#include "lighteffects.h"
 #include "color.h"
 #include "ledstrip.h" // for ColorSet
 

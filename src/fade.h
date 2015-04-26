@@ -1,7 +1,7 @@
 #include <chrono>
 #include <memory>
 
-#include "effects.h"
+#include "lighteffects.h"
 #include "ledstrip.h" // for ColorSet
 
 static const std::chrono::milliseconds FADE_DURATION{2000}; //ms
