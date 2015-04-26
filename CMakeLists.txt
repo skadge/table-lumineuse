@@ -30,7 +30,7 @@ target_link_libraries( ledeffects ${OpenCV_LIBRARIES} )
 
 
 # SOUND EFFECTS
-pkg_check_modules(SFML sfml-all)
+pkg_check_modules(SFML sfml-audio)
 include_directories(${SFML_INCLUDE_DIRS})
 
 add_library(soundeffects SHARED src/soundeffect.cpp 
