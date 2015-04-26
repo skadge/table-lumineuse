@@ -21,12 +21,14 @@ function init() {
     onresize();
     $("#ocean").click(function() {
         $.get(TABLE_URI + '?content={"mode":"NOISE","src":{"type":"ocean"}}');
+        $.get(TABLE_URI + '?content={"mode":"BACKGROUND_SOUND","src":{"value":"water","x":0,"y":0}}');
     });
     $("#nature").click(function() {
         $.get(TABLE_URI + '?content={"mode":"NOISE","src":{"type":"nature"}}');
     });
     $("#fire").click(function() {
         $.get(TABLE_URI + '?content={"mode":"NOISE","src":{"type":"fire"}}');
+        $.get(TABLE_URI + '?content={"mode":"BACKGROUND_SOUND","src":{"value":"fire","x":0,"y":0}}');
     });
 }
 
