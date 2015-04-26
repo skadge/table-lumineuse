@@ -11,9 +11,6 @@
 #include "table.h"
 #include "gpio.h"
 
-#include "soundlibrary.h"
-#include "sfml_sound.h"
-
 using namespace std;
 
 static const double MAIN_LOOP_FPS=60;

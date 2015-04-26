@@ -9,9 +9,9 @@
 
 #include "table.h"
 
-#include "fade.h"
-#include "noise.h"
-#include "gradients.h"
+#include "light/fade.h"
+#include "light/noise.h"
+#include "light/gradients.h"
 
 using namespace std;
 using namespace http::server; // boost asio HTTP server

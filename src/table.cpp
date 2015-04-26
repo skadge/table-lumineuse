@@ -2,8 +2,8 @@
 #include <iostream>
 
 #include "table.h"
-#include "gradients.h"
-#include "fade.h"
+#include "light/gradients.h"
+#include "light/fade.h"
 
 using namespace std;
 

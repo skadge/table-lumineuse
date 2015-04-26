@@ -1,7 +1,7 @@
 #ifndef SOUND_H
 #define SOUND_H
 
-#include "sources.h"
+#include "../sources.h"
 
 
 class SoundSource : public Source {

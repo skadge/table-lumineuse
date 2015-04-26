@@ -1,6 +1,6 @@
 #include "sources.h"
 
-#include "ledstrip.h" // for NB_LEDS
+#include "light/ledstrip.h" // for NB_LEDS
 
 using namespace std;
 

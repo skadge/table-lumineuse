@@ -6,7 +6,7 @@
 #include <string>
 #include <cmath>
 
-#include "color.h"
+#include "light/color.h"
 
 // Table 0,0: top left corner
 static const int TABLE_WIDTH = 1000; //mm

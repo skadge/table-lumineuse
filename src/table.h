@@ -9,10 +9,10 @@
 #include <json/json.h>
 #include <boost/optional.hpp>
 
-#include "ledstrip.h"
-#include "lighteffects.h"
+#include "light/ledstrip.h"
+#include "light/lighteffects.h"
 
-#include "soundlibrary.h"
+#include "sound/soundlibrary.h"
 
 #include "sources.h"
 
