@@ -12,6 +12,13 @@ Crossfade::Crossfade(const chrono::milliseconds fade_duration) :
 
 
 void Crossfade::fade_to(shared_ptr<SoundSource> to) {
+
+    if (!_done) {
+        start_sound->stop();
+        start_sound = end_sound;
+        cout << "Sound cross-fading interrupted by another one." << endl;
+    }
+
     end_sound = to;
     end_sound->volume(0);
     end_sound->play();
