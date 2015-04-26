@@ -79,6 +79,8 @@ reply handler::process_command(const Json::Value& msg)
 
     // Handle the table's mode
     auto mode = msg.get("mode", "PLAIN").asString();
+
+    // ------------ LIGHT EFFECTS ---------------
     if (mode == "PLAIN") {
         auto color = Color(msg["src"]["value"][0u].asInt(),
                            msg["src"]["value"][1u].asInt(),
@@ -101,6 +103,21 @@ reply handler::process_command(const Json::Value& msg)
         cout << "NOISE mode, type: " << type << endl;
         return reply::stock_reply(reply::accepted);
     }
+    
+    // ------------ SOUND EFFECTS ---------------
+    else if (mode == "SOUND") {
+        auto sound = msg["src"]["value"].asString();
+        table->sounds.play(sound);
+        cout << "Playing sound: " << sound << endl;
+        return reply::stock_reply(reply::accepted);
+    }
+    else if (mode == "BACKGROUND_SOUND") {
+        auto sound = msg["src"]["value"].asString();
+        table->sounds.background(sound);
+        cout << "Playing background sound in loop: " << sound << endl;
+        return reply::stock_reply(reply::accepted);
+    }
+    
     else if (mode == "STOP") {
         cout << "STOP mode" << endl;
         table->active = false;

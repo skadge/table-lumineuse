@@ -12,6 +12,8 @@
 #include "ledstrip.h"
 #include "effects.h"
 
+#include "soundlibrary.h"
+
 #include "sources.h"
 
 enum TransitionType { FADE = 0  };
@@ -26,6 +28,7 @@ class Table {
 
     Ledstrip ledstrip;
 
+
     // we need to store two effects to perform transitions
     std::shared_ptr<Effect> previous_effect;
     std::shared_ptr<Effect> current_effect;
@@ -34,10 +37,13 @@ class Table {
 
 public:
 
+    // Access to the sound library, used to start/stop sounds
+    SoundLibrary sounds;
+
     // set this to false to enter 'soft sleep' mode, to true to wake up
     bool active;
 
-    Table();
+    Table(const std::string& sounds_prefix);
 
     void add_light(std::shared_ptr<LightSource> source) {sources.push_back(source);}
 

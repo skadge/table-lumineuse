@@ -8,12 +8,13 @@
 
 using namespace std;
 
-Table::Table(): 
+Table::Table(const string& sounds_prefix): 
         transition_type(FADE),
         transition(make_shared<Fade>()),
         previous_effect(make_shared<Plain>(Color::black)),
         current_effect(make_shared<Plain>(Color::white)),
         previously_active(true),
+        sounds(sounds_prefix),
         active(true) {
 
 }
@@ -25,6 +26,7 @@ void Table::step(chrono::milliseconds dt){
     if (previously_active && !active) {
         cout << "Switching off..." << endl;
         set_next_effect(PLAIN_BLACK);
+        sounds.stopall();
         previously_active = false;
     }
 
@@ -42,6 +44,8 @@ void Table::step(chrono::milliseconds dt){
 
         previously_active = true;
     }
+
+    sounds.step(dt);
 
     // compute the color based on the current effect
     auto colors = current_effect->step(dt);

@@ -50,8 +50,6 @@ int main(int arg, char * argv[]) {
     string prefix = boost::filesystem::initial_path().branch_path().string();
     cout << "Current PREFIX: " << prefix << endl;
 
-    SoundLibrary sounds = SoundLibrary(prefix);
-
     /*
      * Enable and configure  GPIO pin 27 (ie, GPIO 2 on the board)
      */
@@ -61,7 +59,7 @@ int main(int arg, char * argv[]) {
         on_raspi = false;
     }
 
-    auto table = make_shared<Table>();
+    auto table = make_shared<Table>(prefix);
 
     cout << "Listening for clients..." << endl;
     http::server::server<handler> s("0.0.0.0", "8080");
@@ -88,8 +86,6 @@ int main(int arg, char * argv[]) {
     chrono::milliseconds dt{0};
 
     cout << "Entering main loop." << endl;
-
-    sounds.background["water"]->play();
 
     while (running) {
 
