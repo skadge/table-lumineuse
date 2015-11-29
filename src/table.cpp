@@ -13,7 +13,9 @@ Table::Table(const string& sounds_prefix):
         previous_effect(make_shared<Plain>(Color::black)),
         current_effect(make_shared<Plain>(Color::white)),
         previously_active(true),
+#ifdef WITH_SOUNDS
         sounds(sounds_prefix),
+#endif
         active(true) {
 
 }
@@ -25,7 +27,9 @@ void Table::step(chrono::milliseconds dt){
     if (previously_active && !active) {
         cout << "Switching off..." << endl;
         set_next_effect(PLAIN_BLACK);
+#ifdef WITH_SOUNDS
         sounds.stopall();
+#endif
         previously_active = false;
     }
 
@@ -44,7 +48,9 @@ void Table::step(chrono::milliseconds dt){
         previously_active = true;
     }
 
+#ifdef WITH_SOUNDS
     sounds.step(dt);
+#endif
 
     // compute the color based on the current effect
     auto colors = current_effect->step(dt);

@@ -41,8 +41,11 @@ add_executable( table src/main.cpp
                       src/table.cpp
                       src/sources.cpp
                       ${http_server})
-target_link_libraries( table table-gpio table-ledeffects table-soundeffects ${Boost_LIBRARIES} ${JSONCPP_LIBRARIES} )
-
+if(WITH_SOUNDS)
+    target_link_libraries( table table-gpio table-ledeffects table-soundeffects ${Boost_LIBRARIES} ${JSONCPP_LIBRARIES} )
+else()
+    target_link_libraries( table table-gpio table-ledeffects ${Boost_LIBRARIES} ${JSONCPP_LIBRARIES} )
+endif()
 #################
 
 install (TARGETS table table-gpio

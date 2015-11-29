@@ -12,7 +12,9 @@
 #include "light/ledstrip.h"
 #include "light/lighteffects.h"
 
+#ifdef WITH_SOUNDS
 #include "sound/soundlibrary.h"
+#endif
 
 #include "sources.h"
 
@@ -37,8 +39,10 @@ class Table {
 
 public:
 
+#ifdef WITH_SOUNDS
     // Access to the sound library, used to start/stop sounds
     SoundLibrary sounds;
+#endif
 
     // set this to false to enter 'soft sleep' mode, to true to wake up
     bool active;

@@ -103,7 +103,8 @@ reply handler::process_command(const Json::Value& msg)
         cout << "NOISE mode, type: " << type << endl;
         return reply::stock_reply(reply::accepted);
     }
-    
+
+#ifdef WITH_SOUNDS
     // ------------ SOUND EFFECTS ---------------
     else if (mode == "SOUND") {
         auto sound = msg["src"]["value"].asString();
@@ -117,7 +118,8 @@ reply handler::process_command(const Json::Value& msg)
         cout << "Playing background sound in loop: " << sound << endl;
         return reply::stock_reply(reply::accepted);
     }
-    
+#endif
+
     else if (mode == "STOP") {
         cout << "STOP mode" << endl;
         table->active = false;
