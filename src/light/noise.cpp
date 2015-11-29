@@ -99,19 +99,19 @@ ColorSet Noise::step(const std::chrono::milliseconds dt) {
     int j = 0, i =0;
     for (; i < WIDTH; i++) {
         auto val = (float) perlin->noise(i/scale, j/scale, z);
-        next_colors[i] = colormap[(val + 1)/2.f];
+        next_colors[i] = colormap[val + 1];
     }
     for (; j < HEIGHT; j++) {
         auto val = (float) perlin->noise(i/scale, j/scale, z);
-        next_colors[WIDTH + j] = colormap[(val + 1)/2.f];
+        next_colors[WIDTH + j] = colormap[val + 1];
     }
     for (; i >= 0; i--) {
         auto val = (float) perlin->noise(i/scale, j/scale, z);
-        next_colors[WIDTH + HEIGHT + (WIDTH - i)] = colormap[(val + 1)/2.f];
+        next_colors[WIDTH + HEIGHT + (WIDTH - i)] = colormap[val + 1];
     }
     for (; j >= 0; j--) {
         auto val = (float) perlin->noise(i/scale, j/scale, z);
-        next_colors[2 * WIDTH + HEIGHT + (HEIGHT - j)] = colormap[(val + 1)/2.f];
+        next_colors[2 * WIDTH + HEIGHT + (HEIGHT - j)] = colormap[val + 1];
     }
 
     return next_colors;
