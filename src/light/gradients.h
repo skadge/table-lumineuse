@@ -28,8 +28,16 @@ const static Gradient OCEAN_GRADIENT({
         {1.f, {8, 24, 48}}
     });
 
+const static Gradient RAINBOW_GRADIENT({
+        {0.f, {0, 255, 0}},
+        {0.4f, {0, 0, 255}},
+        {0.1f, {255, 0, 0}}
+    });
+
+
 const static std::map<std::string, Gradient> GRADIENTS({
         {"nature", FOREST_GRADIENT},
         {"fire", FIRE_GRADIENT},
-        {"ocean", OCEAN_GRADIENT}
+        {"ocean", OCEAN_GRADIENT},
+        {"rainbow", RAINBOW_GRADIENT}
     });

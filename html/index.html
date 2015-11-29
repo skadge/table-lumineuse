@@ -19,6 +19,9 @@ function onresize() {
 
 function init() {
     onresize();
+    $("#rainbow").click(function() {
+        $.get(TABLE_URI + '?content={"mode":"NOISE","src":{"type":"rainbow"}}');
+    });
     $("#pulse").click(function() {
         $.get(TABLE_URI + '?content={"mode":"PULSE","src":{"id":1,"type":"color","value":[70,30,0],"x":0,"y":0}}');
     });
@@ -35,7 +38,7 @@ function init() {
 <body onload="init()" onresize="onresize()">
 
 <div id="container">
-    <div id="pulse" class="tile bigtile"></div>
+    <div id="rainbow" class="tile bigtile"></div>
     <div class="tile bigtile">
         <a href="tiles.html">
             <img class="content" style="width:100%" src="tiles.svg"/>
