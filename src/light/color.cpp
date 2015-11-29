@@ -149,7 +149,8 @@ Gradient::Gradient(const std::map<float, Color>& gradient) : _gradient(MAX_COLOR
 
 Color Gradient::operator [](float alpha) const {
 
-    assert(alpha <= 1.f);
+    // clamp alpha in [0,1]
+    alpha = min(1.f, max(alpha, 0.f));
 
     int i = round(alpha * MAX_COLORS);
     if (i == MAX_COLORS) i = MAX_COLORS - 1;
