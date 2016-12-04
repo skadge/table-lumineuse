@@ -86,9 +86,12 @@ server<T>::server(const std::string& address, const std::string& port)
 
   do_await_stop();
 
+  // Build an explicit query object to avoid 'host not found (authorative)' at startup
+  // cf stackoverflow.com/questions/12542460
+  boost::asio::ip::tcp::resolver::query query(address, port, boost::asio::ip::resolver_query_base::numeric_service);
   // Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
   boost::asio::ip::tcp::resolver resolver(io_service);
-  boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve({address, port});
+  boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve(query);
   acceptor_.open(endpoint.protocol());
   acceptor_.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
   acceptor_.bind(endpoint);

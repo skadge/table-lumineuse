@@ -36,7 +36,8 @@ vector<string> SoundLibrary::globbing(const string& pattern){
             ret.push_back(string(glob_result.gl_pathv[i]));
     }
 
-    globfree(&glob_result);
+    //TODO commented out the globfree as it causes an invalid free()...?
+    //globfree(&glob_result);
 
     return ret;
 }
