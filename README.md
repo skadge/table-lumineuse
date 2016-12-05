@@ -15,8 +15,87 @@ to its web page. It exposes a simple REST API (see
 would be easy to integrate it with other applications.
 
 
-Dependencies
+Installation
 ------------
 
-- a webserver for the HTML interface
-- SFML 2+ for audio support
+### Build
+
+On a fresh raspbian (I recommend raspbian lite),
+
+```
+$ sudo apt install build-essential cmake git libjsoncpp-dev libboost-system-dev libboost-thread-dev libboost-filesystem-dev
+```
+
+For sound support, install as well `libsfml`:
+```
+$ sudo apt install libsfml-dev
+```
+
+Then:
+
+```
+$ git clone https://github.com/skadge/table-lumineuse.git
+$ cd table-lumineuse && mkdir build && cd build
+$ cmake ..
+$ make
+$ sudo make install
+```
+
+### Installation/Configuration
+
+First, enable the SPI port in `raspi-config` (available in `Advanced options`).
+
+TBD: $LANG=C ; $LC_ALL=C; $LD_LIBRARY_PATH=/usr/local/lib
+
+Then you need a webserver to serve the HTML interface:
+
+```
+$ sudo apt install nginx
+```
+
+Then:
+
+```
+$ sudo ln -s `pwd`/html /var/www/table
+```
+
+And create a file `/etc/nginx/sites-enabled/table` with the following content:
+
+```
+server {
+    listen 80;
+
+    location / {
+        root /var/www/table;
+        try_files $uri $uri/ /index.html;
+        expires 30d;
+    }
+}
+```
+
+Restart `nginx`:
+
+```
+sudo systemctl restart nginx
+```
+
+### Start-up the table whenever the raspberrypi boots
+
+```
+$ cd config && sudo ln -s table /etc/init.d/table
+$ sudo systemctl enable table
+```
+
+
+### Marker tracking
+
+For markers tracking, `table-lumineuse` uses the raspberrypi camera. You must
+install OpenCV:
+
+```
+$ sudo apt install libopencv-dev`
+```
+
+And then, the [https://sourceforge.net/projects/raspicam](`raspicam` library).
+
+
