@@ -49,7 +49,7 @@ protected:
 public:
     Plain(const Color& color) {for (auto& col : plain_colors) col = color;}
 
-    ColorSet step(const std::chrono::milliseconds dt) {return plain_colors;}
+    ColorSet step(const std::chrono::milliseconds dt = std::chrono::milliseconds{0}) {return plain_colors;}
 };
 
 static std::shared_ptr<Plain> PLAIN_BLACK(std::make_shared<Plain>(Color::black));

@@ -49,6 +49,16 @@ int main() {
     Ledstrip leds = Ledstrip();
     cout << "Done." << endl;
 
+    cout << "Plain black for 1sec..." << endl;
+    leds.set(PLAIN_BLACK->step());
+    this_thread::sleep_for(std::chrono::milliseconds{1000});
+    cout << "Plain white for 1sec..." << endl;
+    leds.set(PLAIN_WHITE->step());
+    this_thread::sleep_for(std::chrono::milliseconds{1000});
+    cout << "Plain black for 1sec..." << endl;
+    leds.set(PLAIN_BLACK->step());
+    this_thread::sleep_for(std::chrono::milliseconds{1000});
+
     auto effect1 = std::make_shared<Plain>(Color::red);
     auto effect2 = std::make_shared<Plain>(Color::blue);
 
