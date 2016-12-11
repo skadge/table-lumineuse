@@ -14,7 +14,8 @@
 using namespace std;
 
 Ledstrip::Ledstrip() : 
-    initialized(false) {
+    initialized(false)
+{
 
     int return_value;
 
