@@ -126,8 +126,10 @@ void Ledstrip::set(const ColorSet& colorarray) {
 
     for(int i=0;i<NB_LEDS;i++) {
         tie(r, g, b) = _colors[i].rgb();
+        cout << i<<":("<< r <<","<<g<<","<<b<<"), ";
         write_gamma_color(&buf.pixels[i],r,g,b);
     }
+    cout << endl;
     send_buffer(fd,&buf);
 
 }
