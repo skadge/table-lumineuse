@@ -23,8 +23,16 @@ add_subdirectory(src/light)
 # SOUND EFFECTS
 add_subdirectory(src/sound)
 
-# MARKER TRACKING
-add_subdirectory(src/markers)
+# SPOT TRACKER
+option(WITH_SPOT_TRACKING "Compile the 'spot tracker' executable -- requires OpenCV" ON)
+
+if(WITH_SPOT_TRACKING)
+    if (${OpenCV_FOUND})
+        add_subdirectory(src/spot_tracker)
+    else()
+        message(FATAL "OpenCV required to compile the spot tracker")
+    endif()
+endif()
 
 #
 add_library(table-gpio SHARED src/gpio.c)
