@@ -5,7 +5,7 @@ add_library(table-ledeffects SHARED ledstrip.cpp
                               fade.cpp 
                               noise.cpp)
 
-target_link_libraries(table-ledeffects ${OpenCV_LIBRARIES} )
+target_link_libraries(table-ledeffects)
 
 install (TARGETS table-ledeffects
          LIBRARY DESTINATION lib)
