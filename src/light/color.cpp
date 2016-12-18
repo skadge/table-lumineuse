@@ -71,55 +71,61 @@ Color Color::interpolate(const Color target, float alpha) const {
 }
 
 /* Convert hsv values (0<=h<360, 0<=s<=1, 0<=v<=1) to rgb values (0<=r<=1, etc) */
-void HSVtoRGB(double h, double s, double v, double *r, double *g, double *b) {
-  int i;
-  double f, p, q, t;
+Color Color::fromHSV(double h, double s, double v) {
 
-  if( s < 1.0e-6 ) {
-    /* grey */
-    *r = *g = *b = v;
-    return;
-  }
+    double r,g,b;
 
-  h /= 60.0;			        /* Divide into 6 regions (0-5) */
-  i = (int)floor( h );
-  f = h - (double)i;			/* fractional part of h */
-  p = v * ( 1.0 - s );
-  q = v * ( 1.0 - s * f );
-  t = v * ( 1.0 - s * ( 1.0 - f ) );
+    int i;
+    double f, p, q, t;
 
-  switch( i ) {
-    case 0:
-      *r = v;
-      *g = t;
-      *b = p;
-      break;
-    case 1:
-      *r = q;
-      *g = v;
-      *b = p;
-      break;
-    case 2:
-      *r = p;
-      *g = v;
-      *b = t;
-      break;
-    case 3:
-      *r = p;
-      *g = q;
-      *b = v;
-      break;
-    case 4:
-      *r = t;
-      *g = p;
-      *b = v;
-      break;
-    default:		// case 5:
-      *r = v;
-      *g = p;
-      *b = q;
-      break;
-  }
+    if( s < 1.0e-6 ) {
+        /* grey */
+        r = g = b = v;
+    }
+    else {
+
+        h /= 60.0;			        /* Divide into 6 regions (0-5) */
+        i = (int)floor( h );
+        f = h - (double)i;			/* fractional part of h */
+        p = v * ( 1.0 - s );
+        q = v * ( 1.0 - s * f );
+        t = v * ( 1.0 - s * ( 1.0 - f ) );
+
+        switch( i ) {
+            case 0:
+                r = v;
+                g = t;
+                b = p;
+                break;
+            case 1:
+                r = q;
+                g = v;
+                b = p;
+                break;
+            case 2:
+                r = p;
+                g = v;
+                b = t;
+                break;
+            case 3:
+                r = p;
+                g = q;
+                b = v;
+                break;
+            case 4:
+                r = t;
+                g = p;
+                b = v;
+                break;
+            default:		// case 5:
+                r = v;
+                g = p;
+                b = q;
+                break;
+        }
+    }
+
+    return Color((uint8_t)(r * 255), (uint8_t)(g * 255), (uint8_t)(b * 255));
 }
 
 

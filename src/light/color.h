@@ -22,6 +22,10 @@ public:
 
     RGB rgb() const {return std::make_tuple(_r, _g, _b);}
 
+    /** Create a color from HSV values (0<=h<360, 0<=s<=1, 0<=v<=1)
+    */
+    static Color fromHSV(double h, double s, double v);
+
 #ifdef HAS_OPENCV
     // returns a Vec3f, as expected for OpenCV images of type 32FC3, BGR format
     cv::Vec3f vec3f() const {return cv::Vec3f(_b/255.f, _g/255.f, _r/255.f);}
