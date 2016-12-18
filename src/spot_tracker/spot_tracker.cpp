@@ -74,7 +74,7 @@ int main ( int argc,char **argv ) {
         else {
             //cout << "Center at (" << spot.x << ", " << spot.y << ")";
 
-            auto color = Color::fromHSV(360 * center.x, 1, center.y);
+            auto color = Color::fromHSV(360 * spot.x, 1, spot.y);
 
             if (color != prev_color) {
                 prev_color = color;
