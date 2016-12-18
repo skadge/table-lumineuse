@@ -56,7 +56,8 @@ int main ( int argc,char **argv ) {
 
         auto spot = detector.find_spot(rawimage, argv[1]);
 
-        cout << "Center at (" << spot.x << ", " << spot.y << ")";
+        if (spot.x < 0) cout << "No spot!" << endl;
+        else cout << "Center at (" << spot.x << ", " << spot.y << ")";
 
         auto end = getTickCount();
 

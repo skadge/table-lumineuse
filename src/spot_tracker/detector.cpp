@@ -73,11 +73,14 @@ Point2f Detector::find_spot(cv::InputArray rawimage, const std::string& calibrat
     
     auto mm = moments(img, true);
 
-    Point2i center(mm.m10/mm.m00, mm.m01/mm.m00);
+    // no spot?
+    if(mm.m00 == 0) return {-1,-1};
+
+    Point2f center(mm.m10/mm.m00, mm.m01/mm.m00);
     //cout << center << endl;
     //waitKey();
 
-    return {(float)center.x/img.size().width, (float)center.y/img.size().height};
+    return {center.x/img.size().width, center.y/img.size().height};
 
 }
 

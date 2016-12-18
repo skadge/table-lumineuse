@@ -24,6 +24,10 @@ int main ( int argc,char **argv ) {
 
         auto spot = detector.find_spot(rawimage, argv[1]);
 
+        if (spot.x < 0) cout << "No spot!" << endl;
+        else cout << "Center at (" << spot.x << ", " << spot.y << ")";
+
+
 
         total_time += (getTickCount() - start) * 1000./getTickFrequency();
     }
