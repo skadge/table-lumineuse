@@ -13,7 +13,7 @@ using namespace std;
 using namespace cv;
 
 const double MAX_FPS=10;
-const double EPSILON=.02; // minimum 2% of difference with previous spot to send color update
+const double EPSILON=.005; // minimum 0.5% of difference with previous spot to send color update
 
 int main ( int argc,char **argv ) {
 
