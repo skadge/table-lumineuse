@@ -43,7 +43,7 @@ void perform_request(const std::string& host, const std::string& port, const std
         // allow us to treat all data up until the EOF as the content.
         boost::asio::streambuf request;
         std::ostream request_stream(&request);
-        request_stream << "GET ?" << command << " HTTP/1.0\r\n";
+        request_stream << "GET " << command << " HTTP/1.0\r\n";
         request_stream << "Host: " << host << "\r\n";
         request_stream << "Accept: */*\r\n";
         request_stream << "Connection: close\r\n\r\n";
@@ -105,15 +105,15 @@ void perform_request(const std::string& host, const std::string& port, const std
 
 }
 
-int main(int argc, char* argv[])
-{
-    if (argc != 4)
-    {
-        std::cout << "Usage: http_client <server> <port> <path>\n";
-        return 1;
-    }
-
-    perform_request(argv[1], argv[2], argv[3]);
-
-    return 0;
-}
+//int main(int argc, char* argv[])
+//{
+//    if (argc != 4)
+//    {
+//        std::cout << "Usage: http_client <server> <port> <path>\n";
+//        return 1;
+//    }
+//
+//    perform_request(argv[1], argv[2], argv[3]);
+//
+//    return 0;
+//}

@@ -3,8 +3,11 @@
 #include <map>
 #include <array>
 #include <iostream>
+#include <sstream>
 
 #include "detector.h"
+#include "http_client.h"
+#include "../light/color.h"
 
 using namespace std;
 using namespace cv;
@@ -27,6 +30,11 @@ int main ( int argc,char **argv ) {
         if (spot.x < 0) cout << "No spot!" << endl;
         else cout << "Center at (" << spot.x << ", " << spot.y << ")";
 
+        auto color = Color::fromHSV(360 * spot.x, 1, spot.y);
+
+        stringstream cmd;
+        cmd << "/?content={\"mode\":\"PLAIN\",\"src\":{\"id\":1,\"type\":\"color\",\"value\":" << color << ",\"x\":0,\"y\":0}}";
+        perform_request("localhost", "8080", cmd.str());
 
 
         total_time += (getTickCount() - start) * 1000./getTickFrequency();
