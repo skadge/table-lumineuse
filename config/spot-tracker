@@ -9,9 +9,9 @@
 # Description:       Enable service provided by daemon.
 ### END INIT INFO
 
-dir="/usr/bin"
+dir="/usr/local/bin"
 user="root"
-cmd="spot_tracker /usr/share/spot-tracker/table_calib_320x240_opencv.yml"
+cmd="spot-tracker ../share/spot-tracker/table_calib_320x240_opencv.yml"
 
 name=`basename $0`
 pid_file="/var/run/$name.pid"
