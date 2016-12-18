@@ -12,6 +12,8 @@
 using namespace std;
 using namespace cv;
 
+const double MAX_FPS=10;
+const double EPSILON=.02; // minimum 2% of difference with previous spot to send color update
 
 int main ( int argc,char **argv ) {
 
@@ -49,6 +51,7 @@ int main ( int argc,char **argv ) {
     Mat rawimage;
 
     Color prev_color;
+    Point2f prev_spot;
 
     while (true) {
         auto start = getTickCount();
@@ -61,19 +64,28 @@ int main ( int argc,char **argv ) {
 
         auto spot = detector.find_spot(rawimage, argv[1]);
 
-        if (spot.x < 0) cout << "No spot!" << endl;
-        else cout << "Center at (" << spot.x << ", " << spot.y << ")";
 
-        auto color = Color::fromHSV(360 * center.x, 1, center.y);
+        if (spot.x < 0) {
+            cout << "No spot!" << endl;
+        }
+        else if (abs(spot.x - prev_spot.x) < EPSILON && abs(spot.y - prev_spot.y) < EPSILON) {
+            cout << "Spot too close from previous. Not doing anything." << endl;
+        }
+        else {
+            //cout << "Center at (" << spot.x << ", " << spot.y << ")";
 
-        if (color != prev_color) {
-            prev_color = color;
+            auto color = Color::fromHSV(360 * center.x, 1, center.y);
 
-            stringstream cmd;
-            cmd << "/?content={\"mode\":\"PLAIN\",\"src\":{\"id\":1,\"type\":\"color\",\"value\":" << color << ",\"x\":0,\"y\":0}}";
-            perform_request("localhost", "8080", cmd.str());
+            if (color != prev_color) {
+                prev_color = color;
+
+                stringstream cmd;
+                cmd << "/?content={\"mode\":\"PLAIN\",\"src\":{\"id\":1,\"type\":\"color\",\"value\":" << color << ",\"x\":0,\"y\":0}}";
+                perform_request("localhost", "8080", cmd.str());
+            }
         }
 
+        prev_spot = spot;
 
         auto end = getTickCount();
 
