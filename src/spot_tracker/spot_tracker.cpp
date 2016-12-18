@@ -13,7 +13,7 @@ using namespace cv;
 int main ( int argc,char **argv ) {
 
     if (argc != 2) {
-        cout << "Usage: live_tag_detector <calibration>" << endl;
+        cout << "Usage: " << argv[0] << " <calibration>" << endl;
         return 1;
     }
 
@@ -48,8 +48,8 @@ int main ( int argc,char **argv ) {
     while (true) {
         auto start = getTickCount();
 
-        Camera.grab();
-        Camera.retrieve ( rawimage );
+        camera.grab();
+        camera.retrieve ( rawimage );
 
         auto camera_ticks = getTickCount();
 
