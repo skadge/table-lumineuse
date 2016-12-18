@@ -1,5 +1,7 @@
 #include <raspicam/raspicam_cv.h>
 
+#include <chrono>
+#include <thread>
 #include <map>
 #include <array>
 #include <iostream>
@@ -12,7 +14,9 @@
 using namespace std;
 using namespace cv;
 
-const double MAX_FPS=10;
+static const double MAIN_LOOP_FPS=10;
+static const chrono::milliseconds main_loop_duration{(int) (1000/MAIN_LOOP_FPS)};
+
 const double EPSILON=.005; // minimum 0.5% of difference with previous spot to send color update
 
 int main ( int argc,char **argv ) {
@@ -53,23 +57,24 @@ int main ( int argc,char **argv ) {
     Color prev_color;
     Point2f prev_spot;
 
+    auto start = chrono::high_resolution_clock::now();
+    auto end = start;
+    chrono::milliseconds dt{0};
+
+
     while (true) {
-        auto start = getTickCount();
 
         camera.grab();
         camera.retrieve ( rawimage );
-
-        auto camera_ticks = getTickCount();
-
 
         auto spot = detector.find_spot(rawimage, argv[1]);
 
 
         if (spot.x < 0) {
-            cout << "No spot!" << endl;
+            //cout << "No spot!" << endl;
         }
         else if (abs(spot.x - prev_spot.x) < EPSILON && abs(spot.y - prev_spot.y) < EPSILON) {
-            cout << "Spot too close from previous. Not doing anything." << endl;
+            //cout << "Spot too close from previous. Not doing anything." << endl;
         }
         else {
             //cout << "Center at (" << spot.x << ", " << spot.y << ")";
@@ -87,13 +92,11 @@ int main ( int argc,char **argv ) {
 
         prev_spot = spot;
 
-        auto end = getTickCount();
+        end = chrono::high_resolution_clock::now();
 
-        auto camera_time = (camera_ticks - start) * 1000./getTickFrequency();
-        auto detection_time = (end - camera_ticks) * 1000./getTickFrequency();
-        cout << camera_time + detection_time << "ms for this frame";
-        cout << " (camera: " << camera_time << "ms, detection: ";
-        cout << detection_time << "ms)." << endl;
+        this_thread::sleep_for(main_loop_duration - (end - start));
+
+        start = chrono::high_resolution_clock::now();
     }
     return 0;
 }
