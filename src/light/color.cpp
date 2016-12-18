@@ -28,8 +28,8 @@ bool Color::operator==(const Color& target) const {
 }
 
 ostream& operator<< (ostream &out, const Color &color){
-    out << "[" << static_cast<int>(color._r) << ", " 
-               << static_cast<int>(color._g) << ", " 
+    out << "[" << static_cast<int>(color._r) << "," 
+               << static_cast<int>(color._g) << "," 
                << static_cast<int>(color._b) << "]";
     return out;
 }
