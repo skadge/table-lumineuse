@@ -67,26 +67,29 @@ int main ( int argc,char **argv ) {
         camera.grab();
         camera.retrieve ( rawimage );
 
-        auto spot = detector.find_spot(rawimage, argv[1]);
+        auto spots = detector.find_spots(rawimage, argv[1]);
 
 
-        if (spot.x < 0) {
+        if (spots.empty()) {
             //cout << "No spot!" << endl;
         }
-        else if (abs(spot.x - prev_spot.x) < EPSILON && abs(spot.y - prev_spot.y) < EPSILON) {
-            //cout << "Spot too close from previous. Not doing anything." << endl;
-        }
         else {
-            //cout << "Center at (" << spot.x << ", " << spot.y << ")";
+            auto spot = *spots.begin(); // just take the first spot
+            if (abs(spot.x - prev_spot.x) < EPSILON && abs(spot.y - prev_spot.y) < EPSILON) {
+                //cout << "Spot too close from previous. Not doing anything." << endl;
+            }
+            else {
+                //cout << "Center at (" << spot.x << ", " << spot.y << ")";
 
-            auto color = Color::fromHSV(360 * spot.x, 1, spot.y);
+                auto color = Color::fromHSV(360 * spot.x, 1, spot.y);
 
-            if (color != prev_color) {
-                prev_color = color;
+                if (color != prev_color) {
+                    prev_color = color;
 
-                stringstream cmd;
-                cmd << "/?content={\"mode\":\"PLAIN\",\"src\":{\"id\":1,\"type\":\"color\",\"value\":" << color << ",\"x\":0,\"y\":0}}";
-                perform_request("localhost", "8080", cmd.str());
+                    stringstream cmd;
+                    cmd << "/?content={\"mode\":\"PLAIN\",\"src\":{\"id\":1,\"type\":\"color\",\"value\":" << color << ",\"x\":0,\"y\":0}}";
+                    perform_request("localhost", "8080", cmd.str());
+                }
             }
         }
 

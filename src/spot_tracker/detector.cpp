@@ -4,6 +4,7 @@
 
 #include <opencv2/highgui/highgui.hpp> //for FileStorage
 
+#include <vector>
 #include <bitset>
 #include <iostream>
 
@@ -51,7 +52,7 @@ void Detector::prepare(InputArray rawimage, OutputArray undistorted_img, OutputA
 
 }
 
-Point2f Detector::find_spot(cv::InputArray rawimage, const std::string& calibration) {
+set<Point2f, pointcmp> Detector::find_spots(cv::InputArray rawimage, const std::string& calibration) {
 
     Mat img, small;
     vector<Vec3f> circles;
@@ -74,13 +75,13 @@ Point2f Detector::find_spot(cv::InputArray rawimage, const std::string& calibrat
     auto mm = moments(img, true);
 
     // no spot?
-    if(mm.m00 == 0) return {-1,-1};
+    if(mm.m00 == 0) return {Point2f(-1,-1)};
 
     Point2f center(mm.m10/mm.m00, mm.m01/mm.m00);
     //cout << center << endl;
     //waitKey();
 
-    return {center.x/img.size().width, center.y/img.size().height};
+    return {{center.x/img.size().width, center.y/img.size().height}};
 
 }
 

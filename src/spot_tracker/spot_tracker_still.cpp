@@ -20,16 +20,33 @@ int main ( int argc,char **argv ) {
 
     double total_time = 0;
 
+    if (argc < 3) {
+        cout << "Usage: " << argv[0] << " <calib> <imgs...>" << endl;
+        exit(1);
+    }
+
     for (int i = 2; i < argc; i++) {
+
+        cout << "Reading image " << argv[i] << "..." << endl;
         rawimage = imread(argv[i], 0);
+
+
 
         auto start = getTickCount();
 
-        auto spot = detector.find_spot(rawimage, argv[1]);
+        cout << "Looking for spots..." << endl;
 
-        if (spot.x < 0) cout << "No spot!" << endl;
-        else cout << "Center at (" << spot.x << ", " << spot.y << ")";
+        auto spots = detector.find_spots(rawimage, argv[1]);
 
+        if (spots.empty()) cout << "No spot!" << endl;
+        else {
+            cout << "Found " << spots.size() << " spots" << endl;
+            for (auto spot : spots) {
+                cout << "Center at (" << spot.x << ", " << spot.y << ")" << endl;
+            }
+        }
+
+        auto spot = *spots.begin(); // just take the first one
         auto color = Color::fromHSV(360 * spot.x, 1, spot.y);
 
         stringstream cmd;
