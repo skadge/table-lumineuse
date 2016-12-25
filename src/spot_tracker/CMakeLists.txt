@@ -14,9 +14,9 @@ if (${raspicam_FOUND})
         LIBRARY DESTINATION lib)
 
     install (FILES
-            ../share/table_calib_320x240_opencv.yml
-            ../share/table_calib_640x480_opencv.yml
-            DESTINATION share/spot-tracker
+            ../../share/table_calib_320x240_opencv.yml
+            ../../share/table_calib_640x480_opencv.yml
+            DESTINATION share/spot-tracker)
 
 
 endif()
