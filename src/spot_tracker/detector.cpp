@@ -55,7 +55,7 @@ void Detector::prepare(InputArray rawimage, OutputArray undistorted_img, OutputA
 set<Point2f, pointcmp> Detector::find_spots(cv::InputArray rawimage, const std::string& calibration) {
 
     Mat img, small;
-    vector<Vec3f> circles;
+    set<Point2f, pointcmp> result;
 
     readCalibration(calibration);
 
@@ -71,17 +71,22 @@ set<Point2f, pointcmp> Detector::find_spots(cv::InputArray rawimage, const std::
     erode(img, img, MORPHOLOGICAL_ELEMENT);
 
     //imshow("After erosion", img);
-    
-    auto mm = moments(img, true);
-
-    // no spot?
-    if(mm.m00 == 0) return {Point2f(-1,-1)};
-
-    Point2f center(mm.m10/mm.m00, mm.m01/mm.m00);
-    //cout << center << endl;
     //waitKey();
+    
+    vector<vector<Point>> contours;
+    cv::findContours(img, contours, cv::noArray(), CV_RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
 
-    return {{center.x/img.size().width, center.y/img.size().height}};
+    
+    for (auto contour : contours) {
+        float x=0, y=0;
+        for (auto p : contour) {
+            x += p.x; y += p.y;
+        }
+        result.insert(Point2f((x/contour.size())/img.size().width,
+                              (y/contour.size())/img.size().height));
+    }
+
+    return result;
 
 }
 
