@@ -75,7 +75,12 @@ reply handler::process_command(const Json::Value& msg)
 
 
     // activate the table first, in case it was off (mode 'STOP' may disable it below)
-    table->active = true;
+    //table->active = true;
+
+    if (!table->active) {
+        cerr << "Table in sleep mode!" << endl;
+        return reply::stock_reply(reply::bad_request);
+    }
 
     // Handle the table's mode
     auto mode = msg.get("mode", "PLAIN").asString();
