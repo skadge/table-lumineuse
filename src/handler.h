@@ -24,7 +24,6 @@ private:
     http::server::reply process_command(const Json::Value& msg);
     http::server::reply process_get_state();
 
-    Json::Value root; // will contains the root value after parsing.
     Json::Reader reader;
 
     std::shared_ptr<Table> table;

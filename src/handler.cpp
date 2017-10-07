@@ -44,6 +44,8 @@ void handler::handle_request(const request& request, reply& response)
 
     if (request_path.find("content=") != std::string::npos)
     {
+    	Json::Value root; // will contains the root value after parsing.
+
         string query = request_path.substr(request_path.find("content=") + 8);
         bool parsingSuccessful = reader.parse( query, root );
         if (!parsingSuccessful) {
