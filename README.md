@@ -36,14 +36,14 @@ Then:
 ```
 $ git clone https://github.com/skadge/table-lumineuse.git
 $ cd table-lumineuse && mkdir build && cd build
-$ cmake ..
+$ cmake .. -DCMAKE_BUILD_TYPE=Release -DWITH_SOUNDS=ON
 $ make
 $ sudo make install
 ```
 
 ### Installation/Configuration
 
-First, enable the SPI port in `raspi-config` (available in `Advanced options`).
+First, enable the SPI port in `raspi-config` (available in `Advanced options` or `Interfacing` in more recent version of ` raspi-config`).
 
 TBD: $LANG=C ; $LC_ALL=C; $LD_LIBRARY_PATH=/usr/local/lib
 
@@ -59,7 +59,7 @@ Then:
 $ sudo ln -s `pwd`/html /var/www/table
 ```
 
-And create a file `/etc/nginx/sites-enabled/table` with the following content:
+And replace the default site definition `/etc/nginx/sites-enabled/default` with the following content:
 
 ```
 server {
@@ -96,6 +96,14 @@ install OpenCV:
 $ sudo apt install libopencv-dev`
 ```
 
-And then, the [https://sourceforge.net/projects/raspicam](`raspicam` library).
+And then, the [https://sourceforge.net/projects/raspicam](raspicam library).
 
+Finally, reconfigure the project with the option `WITH_SPOT_TRACKING=ON` and recompile:
+
+```
+$ cd build
+$ cmake .. _DCMAKE_BUILD_TYPE=Release -DWITH_SOUNDS=ON -DWITH_SPOT_TRACKING=ON
+$ make
+$ sudo make install
+```
 

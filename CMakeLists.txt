@@ -19,7 +19,7 @@ add_subdirectory(src/light)
 add_subdirectory(src/sound)
 
 # SPOT TRACKER
-option(WITH_SPOT_TRACKING "Compile the 'spot tracker' executable -- requires OpenCV" ON)
+option(WITH_SPOT_TRACKING "Compile the 'spot tracker' executable -- requires OpenCV" OFF)
 
 if(WITH_SPOT_TRACKING)
     find_package(OpenCV)
