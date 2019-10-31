@@ -3,6 +3,14 @@
 
 #include "color.h"
 
+const static Gradient HALLOWEEN_GRADIENT({
+        {0.f, {0, 0, 0}},
+        {1.f, {31, 78, 16}}, // green
+        {0.43f, {65, 16, 64}}, // purple
+        {0.73f, {231, 33, 0}}, // orange
+        {8.f, {31, 78, 16}}, // green
+        {1.f, {0, 0, 0}}
+    });
 
 const static Gradient FOREST_GRADIENT({
         {0.f, {142, 116, 28}},
@@ -36,6 +44,7 @@ const static Gradient RAINBOW_GRADIENT({
 
 
 const static std::map<std::string, Gradient> GRADIENTS({
+        {"halloween", HALLOWEEN_GRADIENT},
         {"nature", FOREST_GRADIENT},
         {"fire", FIRE_GRADIENT},
         {"ocean", OCEAN_GRADIENT},
