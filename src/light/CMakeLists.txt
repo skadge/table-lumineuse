@@ -3,6 +3,7 @@ add_library(table-ledeffects SHARED ledstrip.cpp
                               lpd8806led.c 
                               color.cpp 
                               fade.cpp 
+                              gradientfade.cpp 
                               noise.cpp)
 
 target_link_libraries(table-ledeffects)
