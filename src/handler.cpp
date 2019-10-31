@@ -11,6 +11,7 @@
 
 #include "light/fade.h"
 #include "light/noise.h"
+#include "light/gradientfade.h"
 #include "light/gradients.h"
 
 using namespace std;
@@ -110,6 +111,13 @@ reply handler::process_command(const Json::Value& msg)
         cout << "NOISE mode, type: " << type << endl;
         return reply::stock_reply(reply::accepted);
     }
+/*    else if (mode == "GRADIENTFADE") {
+        auto type = msg["src"]["type"].asString();
+        table->set_next_effect(make_shared<GradientFade>(GRADIENTS.at(type)));
+        cout << "GRADIENT-FADE mode, type: " << type << endl;
+        return reply::stock_reply(reply::accepted);
+    }
+    */
 
 #ifdef WITH_SOUNDS
     // ------------ SOUND EFFECTS ---------------
