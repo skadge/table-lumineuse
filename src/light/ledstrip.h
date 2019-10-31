@@ -36,6 +36,10 @@ public:
     void set(int idx, Color color);
     void set(const ColorSet& colors);
 
+    /** Set the LED to the provided colors, randomizing the order
+     */
+    void random_set(const ColorSet& colors);
+
     /**
      * Returns optionally the current color of the strip, or
      * nothing if the strip currently has several mixed colors

@@ -8,6 +8,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
+#include <algorithm>
 
 #include "ledstrip.h"
 
@@ -118,6 +119,8 @@ void Ledstrip::set(int idx, Color color) {
 
 void Ledstrip::set(const ColorSet& colorarray) {
 
+    if (colorarray == _colors) return;
+
     _colors = colorarray;
 
     if (!initialized) return;
@@ -130,6 +133,13 @@ void Ledstrip::set(const ColorSet& colorarray) {
     }
     send_buffer(fd,&buf);
 
+}
+
+void Ledstrip::random_set(const ColorSet& colorarray) {
+
+    ColorSet random(colorarray);
+    random_shuffle(std::begin(random), std::end(random));
+    set(random);
 }
 
 boost::optional<Color> Ledstrip::color () const {
