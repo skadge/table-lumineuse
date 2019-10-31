@@ -11,17 +11,36 @@ int main() {
     Ledstrip leds = Ledstrip();
     cout << "Done." << endl;
 
+    ColorSet colors;
+    colors.fill({65,16,64});
+
     cout << "Turning all LEDs red for 1 sec..." << endl;
-    leds.fill(255,0,0);
+    leds.set(colors);
     usleep(1000000);
     cout << "Done." << endl;
 
+    while(true){
     cout << "Turning LEDs cyan one after the other..." << endl;
     for (int i = 0; i < NB_LEDS; i++) {
-        leds.set(i, 0, 128, 128);
-        usleep(100000);
+	colors[i] = {31,78,16};
+        leds.set(colors);
+        usleep(50000);
+    }
+    for (int i = 0; i < NB_LEDS; i++) {
+	colors[i] = {65,16,64};
+        leds.set(colors);
+        usleep(50000);
+    }
+
+
+    cout << "Turning LEDs cyan one after the other..." << endl;
+    for (int i = 0; i < NB_LEDS; i++) {
+	colors[i] = {231,3,0};
+        leds.set(colors);
+        usleep(50000);
     }
     cout << "Done." << endl;
+    }
 
     cout << "Turning all LEDs black for 1 sec..." << endl;
     leds.fill(0,0,0);
