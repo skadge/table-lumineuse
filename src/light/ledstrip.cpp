@@ -35,7 +35,7 @@ Ledstrip::Ledstrip() :
         else {
 
             /* Initialize pixel buffer */
-            if(lpd8806_init(&buf, NB_LEDS + 1) < 0) {
+            if(lpd8806_init(&buf, NB_LEDS + LEDS_OFFSET + 1) < 0) {
                 fprintf(stderr,"Pixel buffer initialization error: Not enough memory.\n");
             }
             else {
@@ -71,7 +71,7 @@ void Ledstrip::blank() {
     if (!initialized) return;
 
     /* Blank the pixels */
-    for(int i=0;i<NB_LEDS;i++) {
+    for(int i=0; i<NB_LEDS+LEDS_OFFSET; i++) {
         write_gamma_color(&buf.pixels[i],0x00,0x00,0x00);
     }
 
@@ -86,7 +86,7 @@ void Ledstrip::fill(uint8_t r, uint8_t g, uint8_t b) {
 
     if (!initialized) return;
 
-    for(int i=0;i<NB_LEDS;i++) {
+    for(int i=LEDS_OFFSET; i<NB_LEDS+LEDS_OFFSET; i++) {
         write_gamma_color(&buf.pixels[i],r,g,b);
     }
 
@@ -102,11 +102,13 @@ void Ledstrip::fill(Color color) {
 
 void Ledstrip::set(int idx, uint8_t r, uint8_t g, uint8_t b) {
 
+    if (idx >= NB_LEDS) return;
+
     _colors[idx] = Color(r, g, b);
 
     if (!initialized) return;
 
-    write_gamma_color(&buf.pixels[idx],r,g,b);
+    write_gamma_color(&buf.pixels[idx+LEDS_OFFSET],r,g,b);
     send_buffer(fd,&buf);
 
 }
@@ -127,9 +129,9 @@ void Ledstrip::set(const ColorSet& colorarray) {
 
     uint8_t r, g, b;
 
-    for(int i=0;i<NB_LEDS;i++) {
+    for(int i=0; i<NB_LEDS; i++) {
         tie(r, g, b) = _colors[i].rgb();
-        write_gamma_color(&buf.pixels[i],r,g,b);
+        write_gamma_color(&buf.pixels[i+LEDS_OFFSET],r,g,b);
     }
     send_buffer(fd,&buf);
 

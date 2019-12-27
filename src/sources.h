@@ -9,8 +9,8 @@
 #include "light/color.h"
 
 // Table 0,0: top left corner
-static const int TABLE_WIDTH = 1000; //mm
-static const int TABLE_HEIGHT = 500; //mm
+static const int TABLE_WIDTH = 600; //mm
+static const int TABLE_HEIGHT = 400; //mm
 
 static const int MAX_COLOR_DISTANCE = 1000; //mm (distance max to which a light source impact LEDs)
 

@@ -14,7 +14,11 @@
 #include "lpd8806led.h"
 
 static const char *SPIDEV = "/dev/spidev0.0";
-static const int NB_LEDS = 32 * 3 + 1;
+//static const int NB_LEDS = 32 * 3 + 1; // 32 LEDs/m
+//static const int LEDS_OFFSET = 0;
+
+static const int NB_LEDS = 63; // on the living room table, only 63 LEDs are used
+static const int LEDS_OFFSET = 33; // first 'useful' LED -> 0 = first LED of the strip
 
 typedef std::array<Color, NB_LEDS> ColorSet;
 
