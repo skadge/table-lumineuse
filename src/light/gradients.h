@@ -4,12 +4,10 @@
 #include "color.h"
 
 const static Gradient HALLOWEEN_GRADIENT({
-        {0.f, {0, 0, 0}},
+        {0.f, {31, 78, 16}}, // green
+        {0.33f, {65, 16, 64}}, // purple
+        {0.66f, {231, 33, 0}}, // orange
         {1.f, {31, 78, 16}}, // green
-        {0.43f, {65, 16, 64}}, // purple
-        {0.73f, {231, 33, 0}}, // orange
-        {8.f, {31, 78, 16}}, // green
-        {1.f, {0, 0, 0}}
     });
 
 const static Gradient FOREST_GRADIENT({

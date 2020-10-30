@@ -33,6 +33,10 @@ function init() {
         $.get(TABLE_URI + '?content={"mode":"BACKGROUND_SOUND","src":{"value":"fire","x":0,"y":0}}');
     });
     $("#halloween").click(function() {
+        $.get(TABLE_URI + '?content={"mode":"NOISE","src":{"type":"halloween"}}');
+        $.get(TABLE_URI + '?content={"mode":"BACKGROUND_SOUND","src":{"value":"halloween","x":0,"y":0}}');
+    });
+    $("#halloween2").click(function() {
         $.get(TABLE_URI + '?content={"mode":"GRADIENTFADE","src":{"type":"halloween"}}');
         $.get(TABLE_URI + '?content={"mode":"BACKGROUND_SOUND","src":{"value":"halloween","x":0,"y":0}}');
     });
@@ -53,9 +57,11 @@ function init() {
         <img class="content" style="width:100%" src="fire.svg"/>
     </div>
     <div id="halloween" class="tile bigtile">
-        <img class="content" style="width:100%" src="fire.svg"/>
+        <img class="content" style="width:100%" src="pumpkin.svg"/>
     </div>
-    <div class="tile bigtile"></div>
+    <div id="halloween2" class="tile bigtile">
+        <img class="content" style="width:100%" src="pumpkin.svg"/>
+    </div>
     <div class="tile bigtile"></div>
 </div>
 </body>
