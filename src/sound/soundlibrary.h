@@ -20,7 +20,7 @@ class SoundLibrary {
 
 public:
 
-    SoundLibrary(const std::string& prefix_path):
+    SoundLibrary(const std::string& prefix_path = "/usr/local"):
         current_foreground_fade(std::make_shared<Crossfade>()),
         current_background_fade(std::make_shared<Crossfade>()) {
         find_sounds(prefix_path);

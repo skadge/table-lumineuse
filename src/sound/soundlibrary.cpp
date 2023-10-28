@@ -43,10 +43,18 @@ vector<string> SoundLibrary::globbing(const string& pattern){
 }
 
 void SoundLibrary::background(const string& sound) {
+    if (_background.count(sound) == 0) {
+	    cout << "Sound " << sound << ".ogg not found!" << endl;
+	    return;
+    }
     current_background_fade->fade_to(_background[sound]);
 }
 
 void SoundLibrary::play(const string& sound) {
+    if (_foreground.count(sound) == 0) {
+	    cout << "Sound " << sound << ".ogg not found!" << endl;
+	    return;
+    }
     current_foreground_fade->fade_to(_foreground[sound]);
     
 }

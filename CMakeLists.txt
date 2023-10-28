@@ -41,6 +41,10 @@ file(GLOB http_server src/http_server/*.cpp)
 # MAIN BINARY #
 ###############
 
+if(WITH_SOUNDS)
+   add_definitions(-DWITH_SOUNDS)
+endif()
+
 add_executable( table src/main.cpp 
                       src/handler.cpp 
                       src/table.cpp
@@ -57,3 +61,5 @@ install (TARGETS table table-gpio
          RUNTIME DESTINATION bin
          LIBRARY DESTINATION lib)
 
+ install(DIRECTORY share
+	 DESTINATION ${CMAKE_INSTALL_PREFIX})
