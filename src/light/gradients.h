@@ -46,5 +46,5 @@ const static std::map<std::string, Gradient> GRADIENTS({
         {"nature", FOREST_GRADIENT},
         {"fire", FIRE_GRADIENT},
         {"ocean", OCEAN_GRADIENT},
-        {"rainbow", RAINBOW_GRADIENT}
+//        {"rainbow", RAINBOW_GRADIENT}
     });
