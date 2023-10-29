@@ -1,0 +1,9 @@
+[Unit]
+Description=Light-table manager
+After=nginx.service
+
+[Service]
+ExecStart=/usr/local/bin/table
+
+[Install]
+WantedBy=default.target
