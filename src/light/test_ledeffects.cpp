@@ -84,19 +84,21 @@ int main() {
     auto orange = std::make_shared<Plain>(Color(128,64,20));
     auto green = std::make_shared<Plain>(Color(17,76,11));
 
-    cout << "Plain black for 1sec..." << endl;
+    cout << "Plain black..." << endl;
     leds.set(PLAIN_BLACK->step());
-    this_thread::sleep_for(std::chrono::milliseconds{1000});
-    cout << "Plain white for 1sec..." << endl;
+    this_thread::sleep_for(std::chrono::milliseconds{2000});
+    cout << "Plain purple..." << endl;
     leds.set(purple->step());
-    this_thread::sleep_for(std::chrono::milliseconds{1000});
+    this_thread::sleep_for(std::chrono::milliseconds{2000});
+    cout << "Plain orange..." << endl;
     leds.set(orange->step());
-    this_thread::sleep_for(std::chrono::milliseconds{1000});
+    this_thread::sleep_for(std::chrono::milliseconds{2000});
+    cout << "Plain green..." << endl;
     leds.set(green->step());
-    this_thread::sleep_for(std::chrono::milliseconds{1000});
-    cout << "Plain black for 1sec..." << endl;
+    this_thread::sleep_for(std::chrono::milliseconds{2000});
+    cout << "Plain black..." << endl;
     leds.set(PLAIN_BLACK->step());
-    this_thread::sleep_for(std::chrono::milliseconds{1000});
+    this_thread::sleep_for(std::chrono::milliseconds{2000});
 
     //noise(&leds, FIRE_GRADIENT);
     //noise(&leds, OCEAN_GRADIENT);
